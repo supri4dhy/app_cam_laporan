@@ -700,7 +700,7 @@ textarea:focus {
 .layout-2-landscape .t-box {
   width: 85%;
   height: auto;
-  aspect-ratio: 16 / 9;
+  aspect-ratio: 4 / 3;
 }
 
 /* Layout 3 Landscape Preview */
@@ -714,7 +714,7 @@ textarea:focus {
 .layout-3-landscape .t-box {
   width: 70%;
   height: auto;
-  aspect-ratio: 16 / 9;
+  aspect-ratio: 4 / 3;
 }
 
 /* Layout 3 Mix Preview */
@@ -734,12 +734,12 @@ textarea:focus {
 .layout-3-mix .t-sub-grid-top .t-box {
   width: 32%;
   height: auto;
-  aspect-ratio: 9 / 16;
+  aspect-ratio: 3 / 4;
 }
 .layout-3-mix > .t-box {
   width: 66%;
   height: auto;
-  aspect-ratio: 16 / 9;
+  aspect-ratio: 4 / 3;
 }
 
 /* Layout 4 Portrait Preview */
@@ -754,7 +754,7 @@ textarea:focus {
 .layout-4-portrait .t-box {
   width: 75%;
   height: auto;
-  aspect-ratio: 9 / 16;
+  aspect-ratio: 3 / 4;
 }
 
 /* Layout 2 Portrait Preview */
@@ -767,7 +767,7 @@ textarea:focus {
 .layout-2-portrait .t-box {
   width: 40%;
   height: auto;
-  aspect-ratio: 9 / 16;
+  aspect-ratio: 3 / 4;
 }
 
 /* Layout 4 Landscape Preview */
@@ -782,7 +782,7 @@ textarea:focus {
 .layout-4-landscape .t-box {
   width: 85%;
   height: auto;
-  aspect-ratio: 16 / 9;
+  aspect-ratio: 4 / 3;
 }
 
 /* Photo Upload Layout (Step 3) */
@@ -843,7 +843,7 @@ textarea:focus {
   background-color: var(--bg-tertiary);
   border: 2px dashed #cbd5e1;
   border-radius: 10px;
-  aspect-ratio: 16 / 9; /* Lock to photographic aspect ratio 16:9 */
+  aspect-ratio: 4 / 3; /* Lock to aspect ratio 4:3 */
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -856,7 +856,7 @@ textarea:focus {
 }
 
 .photo-slot.portrait-slot {
-  aspect-ratio: 9 / 16; /* Lock to photographic aspect ratio 9:16 */
+  aspect-ratio: 3 / 4; /* Lock to aspect ratio 3:4 */
 }
 
 .photo-slot:hover {
@@ -1288,8 +1288,7 @@ textarea:focus {
   gap: 16px;
 }
 .pdf-grid-2-landscape .pdf-photo-box {
-  width: 620px; /* Lock width on A4 page */
-  aspect-ratio: 16 / 9; /* Lock ratio to exactly 16:9 landscape */
+  width: 520px; /* Lock width on A4 page */
 }
 
 .pdf-grid-3-landscape {
@@ -1299,14 +1298,14 @@ textarea:focus {
   gap: 12px;
 }
 .pdf-grid-3-landscape .pdf-photo-box {
-  width: 440px; /* Smaller so 3 of them fit vertically on A4 */
-  aspect-ratio: 16 / 9; /* Lock ratio to exactly 16:9 landscape */
+  width: 340px; /* Smaller so 3 of them fit vertically on A4 */
 }
 
 .pdf-grid-3-mix {
   display: flex;
   flex-direction: column;
   justify-content: center;
+  align-items: center; /* Center horizontally */
   gap: 16px;
 }
 
@@ -1318,11 +1317,9 @@ textarea:focus {
 }
 .pdf-grid-3-toprow .pdf-photo-box {
   width: 215px; /* Portrait boxes */
-  aspect-ratio: 9 / 16; /* Lock ratio to exactly 9:16 portrait */
 }
 .pdf-grid-3-mix > .pdf-photo-box { /* Bottom landscape box */
-  width: 446px; /* Matches the top row combined width */
-  aspect-ratio: 16 / 9; /* Lock ratio to exactly 16:9 landscape */
+  width: 340px; /* Reduced to match aspect-ratio 4:3 safely */
 }
 
 .pdf-grid-4-portrait {
@@ -1336,7 +1333,6 @@ textarea:focus {
 }
 .pdf-grid-4-portrait .pdf-photo-box {
   width: 220px; /* Portrait boxes */
-  aspect-ratio: 9 / 16; /* Lock ratio to exactly 9:16 portrait */
 }
 
 .pdf-grid-2-portrait {
@@ -1347,7 +1343,6 @@ textarea:focus {
 }
 .pdf-grid-2-portrait .pdf-photo-box {
   width: 280px; /* Portrait boxes side by side */
-  aspect-ratio: 9 / 16; /* Lock ratio to exactly 9:16 portrait */
 }
 
 .pdf-grid-4-landscape {
@@ -1361,7 +1356,6 @@ textarea:focus {
 }
 .pdf-grid-4-landscape .pdf-photo-box {
   width: 300px;
-  aspect-ratio: 16 / 9; /* Lock ratio to exactly 16:9 landscape */
 }
 
 /* PDF Image Box */
@@ -1373,15 +1367,11 @@ textarea:focus {
   position: relative;
   display: flex;
   flex-direction: column;
-  height: 100%;
+  height: auto;
   min-height: 0;
 }
 
 .pdf-photo-box img {
-  width: 100%;
-  height: 100%;
-  flex-grow: 1;
-  min-height: 0;
   background-color: #ffffff;
 }
 
@@ -1404,6 +1394,14 @@ textarea:focus {
   justify-content: space-between;
   font-size: 9px;
   color: #94a3b8;
+}
+
+.pdf-footer-left {
+  flex: 1;
+  min-width: 0;
+  white-space: normal;
+  word-break: break-all;
+  padding-right: 12px;
 }
 
 /* Footer text */
@@ -1533,11 +1531,8 @@ textarea:focus {
   backdrop-filter: blur(2px);
   -webkit-backdrop-filter: blur(2px);
   color: #ffffff;
-  padding: 6px 10px;
+  padding: 4px 8px;
   font-family: var(--font-body);
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
   z-index: 4;
   pointer-events: none;
   border-top: 1px solid rgba(255, 255, 255, 0.15);
@@ -1562,7 +1557,7 @@ textarea:focus {
 }
 
 .w-time {
-  font-size: 9px;
+  font-size: 7px;
   font-weight: 500;
   opacity: 0.95;
   display: flex;

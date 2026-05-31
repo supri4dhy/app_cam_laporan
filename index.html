@@ -22,8 +22,8 @@
   <link rel="icon" type="image/png" href="icon-192.png">
   
   <!-- Custom CSS -->
-  <link rel="stylesheet" href="style.css?v=3.9">
-  <link rel="stylesheet" href="style-mobile.css?v=3.9">
+  <link rel="stylesheet" href="style.css?v=4.8">
+  <link rel="stylesheet" href="style-mobile.css?v=4.8">
   <!-- jsPDF & html2canvas -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -452,8 +452,13 @@
             </div>
 
             <div class="pdf-footer">
-              <p>Dibuat secara otomatis melalui LaporCAM App pada <span id="pdf-current-timestamp"></span></p>
-              <p>Halaman 1 dari 1</p>
+              <div class="pdf-footer-left">
+                <p>Laporan ini dibuat menggunakan aplikasi <strong>LaporCAM</strong> (<a id="pdf-app-link" href="#" target="_blank" style="color: #0d9488; text-decoration: underline;"></a>) pada <span id="pdf-current-timestamp"></span></p>
+              </div>
+              <div class="pdf-footer-right" style="display: flex; align-items: center; gap: 4px; font-weight: 800;">
+                <i class="fa-solid fa-camera-retro" style="color: #0d9488; font-size: 10px;"></i>
+                <span style="color: #0d9488; font-size: 10px;">LaporCAM</span>
+              </div>
             </div>
           </div>
         </div>
@@ -523,13 +528,13 @@
   </nav>
 
   <!-- Custom JS Modules -->
-  <script src="js/state.js?v=3.5"></script>
-  <script src="js/voice.js?v=3.5"></script>
-  <script src="js/step1_data.js?v=3.5"></script>
-  <script src="js/step2_tmpl.js?v=3.5"></script>
-  <script src="js/step3_photo.js?v=3.5"></script>
-  <script src="js/step4_pdf.js?v=3.5"></script>
-  <script src="app.js?v=3.5"></script>
+  <script src="js/state.js?v=4.5"></script>
+  <script src="js/voice.js?v=4.5"></script>
+  <script src="js/step1_data.js?v=4.5"></script>
+  <script src="js/step2_tmpl.js?v=4.5"></script>
+  <script src="js/step3_photo.js?v=4.5"></script>
+  <script src="js/step4_pdf.js?v=4.5"></script>
+  <script src="app.js?v=4.5"></script>
 </body>
 
 </html>

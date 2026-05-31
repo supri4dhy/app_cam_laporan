@@ -469,11 +469,8 @@
   .photo-watermark {
     padding: 4px 8px;
   }
-  .w-logo, .w-time {
-    font-size: 8px;
-  }
-  .watermark-row-gps {
-    font-size: 7px;
+  .w-time {
+    font-size: 6px;
   }
 }
 

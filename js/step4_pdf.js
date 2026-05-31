@@ -59,6 +59,14 @@ function preparePDFPreview() {
     hour: '2-digit', minute: '2-digit', second: '2-digit'
   }) + ' WIB';
   elements.pdfCurrentTimestamp.textContent = formatTimestamp;
+
+  // Set link aplikasi dinamis sesuai domain server aktif
+  const appLink = document.getElementById('pdf-app-link');
+  if (appLink) {
+    const cleanUrl = window.location.origin + window.location.pathname;
+    appLink.href = cleanUrl;
+    appLink.textContent = cleanUrl.replace(/\/$/, ''); // Hapus trailing slash agar rapi
+  }
   
   // Render layout foto pada pratinjau PDF
   renderPDFPhotosLayout();
@@ -133,34 +141,34 @@ function renderPDFPhotosLayout() {
   }
 }
 
-// Helper: Dapatkan dimensi piksel boks foto PDF berdasarkan template dan indeks slot
+// Helper: Dapatkan dimensi piksel boks foto PDF berdasarkan template dan indeks slot (Rasio 4:3 / 3:4)
 function getPDFBoxDimensions(t, index) {
   let w = 300;
-  let h = 168.75;
+  let h = 225;
   
   if (t === '2-landscape') {
-    w = 620;
-    h = 348.75;
+    w = 520;
+    h = 390;
   } else if (t === '3-landscape') {
-    w = 440;
-    h = 247.5;
+    w = 340;
+    h = 255;
   } else if (t === '3-mix') {
     if (index === 0 || index === 1) {
       w = 215;
-      h = 382.2;
+      h = 287;
     } else {
-      w = 446;
-      h = 250.875;
+      w = 340;
+      h = 255;
     }
   } else if (t === '4-portrait') {
     w = 220;
-    h = 391.1;
+    h = 293;
   } else if (t === '2-portrait') {
     w = 280;
-    h = 497.7;
+    h = 373;
   } else if (t === '4-landscape') {
     w = 300;
-    h = 168.75;
+    h = 225;
   }
   
   return { w, h };
@@ -194,29 +202,27 @@ function createPDFPhotoBox(index, captionText, isPortrait) {
     gpsText = `${appState.coordinates.lat.toFixed(5)}, ${appState.coordinates.lng.toFixed(5)}`;
   }
   
-  let logoHtml = `<span class="w-logo"><i class="fa-solid fa-camera-retro"></i> LaporCAM</span>`;
-  if (appState.logoDataURL) {
-    logoHtml = `<span class="w-logo" style="display: flex; align-items: center; gap: 4px;"><img src="${appState.logoDataURL}" alt="Logo" style="height: 12px; max-width: 60px; object-fit: contain; vertical-align: middle;"></span>`;
-  }
+  let logoHtml = `<span class="w-logo" style="color: #2dd4bf;"><i class="fa-solid fa-camera-retro"></i> LaporCAM</span>`;
   
   if (photoSrc) {
     const r_img = appState.photoAspectRatios[index] || 1.0;
     const dims = getPDFBoxDimensions(appState.selectedTemplate, index);
     const W_box_pdf = dims.w;
     const H_box_pdf = dims.h;
+    const r_box_pdf = W_box_pdf / H_box_pdf;
     
     let W_render_pdf, H_render_pdf, top_render_pdf, left_render_pdf;
     
-    if (r_img >= 1.0) { // Landscape
-      W_render_pdf = W_box_pdf;
-      H_render_pdf = W_box_pdf / r_img;
-      top_render_pdf = (H_box_pdf - H_render_pdf) / 2;
-      left_render_pdf = 0;
-    } else { // Portrait
+    if (r_img >= r_box_pdf) { // Gambar lebih landscape dari boks (Cover)
       H_render_pdf = H_box_pdf;
       W_render_pdf = H_box_pdf * r_img;
       left_render_pdf = (W_box_pdf - W_render_pdf) / 2;
       top_render_pdf = 0;
+    } else { // Gambar lebih portrait dari boks (Cover)
+      W_render_pdf = W_box_pdf;
+      H_render_pdf = W_box_pdf / r_img;
+      top_render_pdf = (H_box_pdf - H_render_pdf) / 2;
+      left_render_pdf = 0;
     }
     
     // Hitung batas geser PDF
@@ -233,15 +239,25 @@ function createPDFPhotoBox(index, captionText, isPortrait) {
     const x_pdf = pctX * maxX_pdf;
     const y_pdf = pctY * maxY_pdf;
 
+    // Siapkan logo kustom melayang di pojok kanan atas jika diunggah pengguna (menggunakan ukuran persentase terhadap boks foto)
+    let customLogoHtml = '';
+    if (appState.logoDataURL) {
+      customLogoHtml = `
+        <div class="photo-logo-watermark" style="position: absolute; top: 2.5%; right: 2.5%; z-index: 60; opacity: 0.8; width: 10%; display: flex; justify-content: center; align-items: center; pointer-events: none;">
+          <img src="${appState.logoDataURL}" style="width: 100%; height: auto; object-fit: contain; background: transparent; filter: none;">
+        </div>
+      `;
+    }
+
     box.innerHTML = `
-      <div class="pdf-photo-img-wrapper" style="overflow: hidden; position: relative; width: 100%; height: 100%; flex-grow: 1;">
+      <div class="pdf-photo-img-wrapper" style="overflow: hidden; position: relative; width: ${W_box_pdf}px; height: ${H_box_pdf}px; flex-shrink: 0;">
         <img src="${photoSrc}" alt="Foto ${index + 1}" style="position: absolute; top: ${top_render_pdf}px; left: ${left_render_pdf}px; width: ${W_render_pdf}px; height: ${H_render_pdf}px; object-fit: fill; transform: translate(${x_pdf}px, ${y_pdf}px) scale(${scale}); transform-origin: center;">
-        <div class="photo-watermark">
+        ${customLogoHtml}
+        <div class="photo-watermark" style="position: absolute; bottom: 0; left: 0; right: 0; z-index: 50;">
           <div class="watermark-row-main">
-            ${logoHtml}
             ${tanggalFormatted ? `<span class="w-time"><i class="fa-solid fa-clock"></i> ${tanggalFormatted}</span>` : ''}
+            ${gpsText ? `<span class="w-time" style="margin-left: auto;"><i class="fa-solid fa-location-dot"></i> GPS: ${gpsText}</span>` : ''}
           </div>
-          ${gpsText ? `<div class="watermark-row-gps"><i class="fa-solid fa-location-dot"></i> GPS: ${gpsText}</div>` : ''}
         </div>
       </div>
       <div class="pdf-photo-caption">${captionText}</div>
@@ -261,8 +277,14 @@ function createPDFPhotoBox(index, captionText, isPortrait) {
 
 // 4. Membuat PDF Laporan A4
 function generatePDFReport() {
-  const nama = elements.kegiatanNama.value.trim() || 'Dokumentasi_Kegiatan';
-  const cleanFileName = nama.replace(/[^a-zA-Z0-9]/g, '_').substring(0, 30);
+  const namaInput = elements.kegiatanNama.value.trim() || 'Dokumentasi_Kegiatan';
+  const kataArray = namaInput.split(/\s+/).slice(0, 5);
+  const cleanWords = kataArray.map(w => w.replace(/[^a-zA-Z0-9]/g, ''));
+  const cleanFileName = cleanWords.filter(w => w.length > 0).join('_') || 'Dokumentasi_Kegiatan';
+  
+  const d = new Date();
+  const formatTgl = `${String(d.getDate()).padStart(2,'0')}_${String(d.getMonth()+1).padStart(2,'0')}_${d.getFullYear()}`;
+  const finalFileName = `${cleanFileName}_${formatTgl}.pdf`;
   
   showLoading("Sedang menyusun halaman PDF A4...");
   
@@ -294,7 +316,7 @@ function generatePDFReport() {
       const pdfHeight = pdf.internal.pageSize.getHeight();
       
       pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight);
-      pdf.save(`${cleanFileName}_${getFormattedDateShort()}.pdf`);
+      pdf.save(finalFileName);
       
       hideLoading();
       showToast("Dokumentasi PDF berhasil dibuat dan diunduh ke perangkat Anda!", "success");

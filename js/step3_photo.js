@@ -270,25 +270,26 @@ function updateSlotPreviewUI(slotEl, slotId, dataUrl) {
   if (!W_box || !H_box) {
     if (slotEl.classList.contains('portrait-slot')) {
       W_box = 180;
-      H_box = 320;
+      H_box = 240;
     } else {
-      W_box = 320;
+      W_box = 240;
       H_box = 180;
     }
   }
   
+  const r_box = W_box / H_box;
   let W_render, H_render, top_render, left_render;
   
-  if (r_img >= 1.0) { // Landscape
-    W_render = W_box;
-    H_render = W_box / r_img;
-    top_render = (H_box - H_render) / 2;
-    left_render = 0;
-  } else { // Portrait
+  if (r_img >= r_box) { // Gambar lebih landscape dari boks (Cover)
     H_render = H_box;
     W_render = H_box * r_img;
     left_render = (W_box - W_render) / 2;
     top_render = 0;
+  } else { // Gambar lebih portrait dari boks (Cover)
+    W_render = W_box;
+    H_render = W_box / r_img;
+    top_render = (H_box - H_render) / 2;
+    left_render = 0;
   }
   
   imgEl.style.position = 'absolute';
@@ -518,20 +519,21 @@ function getDistance(touch1, touch2) {
   return Math.sqrt(dx * dx + dy * dy);
 }
 
-// Helper: Hitung batas geser maksimum (maxX, maxY) agar gambar tidak meninggalkan celah di boks
 function calculateBounds(imgEl, slotEl, scale, slotId) {
   const W_box = slotEl.clientWidth || 300;
-  const H_box = slotEl.clientHeight || 168.75;
+  const H_box = slotEl.clientHeight || 225;
   const r_img = appState.photoAspectRatios[slotId] || 1.0;
+  
+  const r_box = W_box / H_box;
   
   let W_render, H_render;
   
-  if (r_img >= 1.0) { // Landscape
-    W_render = W_box;
-    H_render = W_box / r_img;
-  } else { // Portrait
+  if (r_img >= r_box) { // Gambar lebih landscape dari boks
     H_render = H_box;
     W_render = H_box * r_img;
+  } else { // Gambar lebih portrait dari boks
+    W_render = W_box;
+    H_render = W_box / r_img;
   }
   
   // Hitung batas geser X & Y maksimal dari titik tengah
