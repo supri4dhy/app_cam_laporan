@@ -1633,3 +1633,152 @@ textarea:focus {
     transform: translateY(-1px) scale(1.05);
   }
 }
+
+/* Layout data kegiatan Step 1 */
+.form-inputs-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  gap: 16px;
+  flex: 1;
+  min-height: 0;
+}
+
+#kegiatan-nama {
+  font-size: 14px;
+  font-weight: 500;
+  min-height: 90px;
+  line-height: 1.5;
+}
+
+/* Watermark Foto Dokumentasi PDF */
+.photo-watermark {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(15, 23, 42, 0.75);
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+  color: #ffffff;
+  padding: 6px 10px;
+  font-family: var(--font-body);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  z-index: 4;
+  pointer-events: none;
+  border-top: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.watermark-row-main {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.w-logo {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: #2dd4bf; /* Tosca neon */
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.w-time {
+  font-size: 9px;
+  font-weight: 500;
+  opacity: 0.95;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.watermark-row-gps {
+  font-size: 8px;
+  opacity: 0.85;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  margin-top: 1px;
+}
+
+/* Pada resolusi kecil, sesuaikan ukuran watermark */
+@media (max-width: 480px) {
+  .photo-watermark {
+    padding: 4px 8px;
+  }
+  .w-logo, .w-time {
+    font-size: 8px;
+  }
+  .watermark-row-gps {
+    font-size: 7px;
+  }
+}
+
+/* Logo Instansi Upload Styles */
+.logo-upload-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background-color: var(--bg-tertiary);
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--border-color);
+}
+
+.logo-preview-box {
+  width: 48px;
+  height: 48px;
+  border-radius: 8px;
+  border: 1px dashed #cbd5e1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #ffffff;
+  overflow: hidden;
+  position: relative;
+  flex-shrink: 0;
+}
+
+.logo-preview-box img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+.logo-preview-box .placeholder-icon {
+  font-size: 20px;
+  color: var(--text-muted);
+}
+
+.logo-upload-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.btn-danger-sm {
+  background-color: #fef2f2;
+  border: 1px solid #fee2e2;
+  color: #ef4444;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-danger-sm:hover {
+  background-color: #fee2e2;
+  transform: translateY(-1px);
+}
+

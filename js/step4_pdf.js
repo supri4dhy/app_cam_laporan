@@ -25,6 +25,25 @@ function preparePDFPreview() {
   elements.pdfValAlamat.textContent = alamat;
   elements.pdfValPelapor.textContent = pelapor;
   
+  // Update Logo Instansi di Header PDF
+  if (appState.logoDataURL) {
+    if (elements.pdfLogoImg) {
+      elements.pdfLogoImg.src = appState.logoDataURL;
+      elements.pdfLogoImg.classList.remove('hidden');
+    }
+    if (elements.pdfDefaultLogoIcon) {
+      elements.pdfDefaultLogoIcon.classList.add('hidden');
+    }
+  } else {
+    if (elements.pdfLogoImg) {
+      elements.pdfLogoImg.src = '';
+      elements.pdfLogoImg.classList.add('hidden');
+    }
+    if (elements.pdfDefaultLogoIcon) {
+      elements.pdfDefaultLogoIcon.classList.remove('hidden');
+    }
+  }
+  
   // Koordinat GPS
   if (appState.coordinates) {
     elements.pdfRowCoords.style.display = 'flex';
@@ -106,7 +125,7 @@ function renderPDFPhotosLayout() {
   }
 }
 
-// 3. Membuat Element Box Foto untuk PDF
+// 3. Membuat Element Box Foto untuk PDF dengan Watermark Logo & Timestamp
 function createPDFPhotoBox(index, captionText, isPortrait) {
   const box = document.createElement('div');
   box.className = 'pdf-photo-box';
@@ -114,10 +133,42 @@ function createPDFPhotoBox(index, captionText, isPortrait) {
   const photoSrc = appState.photos[index];
   const transform = appState.photoTransforms[index] || { x: 0, y: 0, scale: 1.0 };
   
+  // Siapkan data untuk watermark
+  const tanggalInput = elements.kegiatanTanggal.value;
+  const waktuInput = elements.kegiatanWaktu.value;
+  let tanggalFormatted = '';
+  if (tanggalInput) {
+    const dateObj = new Date(tanggalInput);
+    const d = String(dateObj.getDate()).padStart(2, '0');
+    const m = String(dateObj.getMonth() + 1).padStart(2, '0');
+    const y = dateObj.getFullYear();
+    tanggalFormatted = `${d}/${m}/${y}`;
+    if (waktuInput) {
+      tanggalFormatted += ` ${waktuInput} WIB`;
+    }
+  }
+
+  let gpsText = '';
+  if (appState.coordinates) {
+    gpsText = `${appState.coordinates.lat.toFixed(5)}, ${appState.coordinates.lng.toFixed(5)}`;
+  }
+  
+  let logoHtml = `<span class="w-logo"><i class="fa-solid fa-camera-retro"></i> LaporCam</span>`;
+  if (appState.logoDataURL) {
+    logoHtml = `<span class="w-logo" style="display: flex; align-items: center; gap: 4px;"><img src="${appState.logoDataURL}" alt="Logo" style="height: 12px; max-width: 60px; object-fit: contain; vertical-align: middle;"></span>`;
+  }
+  
   if (photoSrc) {
     box.innerHTML = `
       <div class="pdf-photo-img-wrapper" style="overflow: hidden; position: relative; width: 100%; height: 100%; flex-grow: 1;">
         <img src="${photoSrc}" alt="Foto ${index + 1}" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; transform: translate(${transform.x}px, ${transform.y}px) scale(${transform.scale}); transform-origin: center;">
+        <div class="photo-watermark">
+          <div class="watermark-row-main">
+            ${logoHtml}
+            ${tanggalFormatted ? `<span class="w-time"><i class="fa-solid fa-clock"></i> ${tanggalFormatted}</span>` : ''}
+          </div>
+          ${gpsText ? `<div class="watermark-row-gps"><i class="fa-solid fa-location-dot"></i> GPS: ${gpsText}</div>` : ''}
+        </div>
       </div>
       <div class="pdf-photo-caption">${captionText}</div>
     `;

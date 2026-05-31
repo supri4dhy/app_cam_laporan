@@ -73,72 +73,95 @@
           <h2>Detail Kegiatan & Laporan</h2>
         </div>
 
-        <div class="form-group">
-          <div class="label-with-action">
-            <label for="kegiatan-nama">
-              <i class="fa-solid fa-circle-info"></i> Nama Kegiatan
-            </label>
-            <button type="button" id="btn-mic-nama" class="btn-mic-recording" title="Dikte Suara">
-              <i class="fa-solid fa-microphone"></i> Dikte
-            </button>
-          </div>
-          <div class="input-wrapper">
-            <i class="fa-solid fa-pen-clip input-icon"></i>
-            <input type="text" id="kegiatan-nama" placeholder="Contoh: Peninjauan Jembatan Rusak Dusun A" required>
-          </div>
-        </div>
-
-        <div class="form-row">
+        <div class="form-inputs-container">
           <div class="form-group">
-            <label for="kegiatan-tanggal">
-              <i class="fa-solid fa-calendar-day"></i> Hari & Tanggal
-            </label>
+            <div class="label-with-action">
+              <label for="kegiatan-nama">
+                <i class="fa-solid fa-circle-info"></i> Nama Kegiatan
+              </label>
+              <button type="button" id="btn-mic-nama" class="btn-mic-recording" title="Dikte Suara">
+                <i class="fa-solid fa-microphone"></i> Dikte
+              </button>
+            </div>
             <div class="input-wrapper">
-              <i class="fa-solid fa-calendar-days input-icon"></i>
-              <input type="date" id="kegiatan-tanggal">
+              <i class="fa-solid fa-pen-clip input-icon align-top"></i>
+              <textarea id="kegiatan-nama" rows="2" placeholder="Contoh: Peninjauan Jembatan Rusak Dusun A" required></textarea>
             </div>
           </div>
-          <div class="form-group">
-            <label for="kegiatan-waktu">
-              <i class="fa-solid fa-clock"></i> Waktu
-            </label>
-            <div class="input-wrapper">
-              <i class="fa-solid fa-clock input-icon"></i>
-              <input type="time" id="kegiatan-waktu">
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="kegiatan-tanggal">
+                <i class="fa-solid fa-calendar-day"></i> Hari & Tanggal
+              </label>
+              <div class="input-wrapper">
+                <i class="fa-solid fa-calendar-days input-icon"></i>
+                <input type="date" id="kegiatan-tanggal">
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="kegiatan-waktu">
+                <i class="fa-solid fa-clock"></i> Waktu
+              </label>
+              <div class="input-wrapper">
+                <i class="fa-solid fa-clock input-icon"></i>
+                <input type="time" id="kegiatan-waktu">
+              </div>
             </div>
           </div>
-        </div>
 
-        <div class="form-group">
-          <div class="label-with-action">
-            <label for="kegiatan-alamat">
-              <i class="fa-solid fa-location-dot"></i> Alamat & Lokasi
+          <div class="form-group">
+            <div class="label-with-action">
+              <label for="kegiatan-alamat">
+                <i class="fa-solid fa-location-dot"></i> Alamat & Lokasi
+              </label>
+              <button type="button" id="btn-gps" class="btn-secondary-sm">
+                <i class="fa-solid fa-crosshairs"></i> Dapatkan GPS
+              </button>
+            </div>
+            <div class="input-wrapper">
+              <i class="fa-solid fa-map-location-dot input-icon align-top"></i>
+              <textarea id="kegiatan-alamat" rows="3"
+                placeholder="Masukkan alamat lengkap atau klik 'Dapatkan GPS' untuk mendeteksi lokasi secara otomatis..."></textarea>
+            </div>
+            <div id="gps-status" class="gps-status-info hidden">
+              <i class="fa-solid fa-spinner fa-spin"></i> Mendapatkan koordinat...
+            </div>
+            <div class="coordinates-display hidden" id="coords-container">
+              <span class="badge"><i class="fa-solid fa-compass"></i> Lat: <span id="lat-val">-</span></span>
+              <span class="badge"><i class="fa-solid fa-compass"></i> Lng: <span id="lng-val">-</span></span>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="kegiatan-pelapor">
+              <i class="fa-solid fa-user"></i> Pelapor / Petugas
             </label>
-            <button type="button" id="btn-gps" class="btn-secondary-sm">
-              <i class="fa-solid fa-crosshairs"></i> Dapatkan GPS
-            </button>
+            <div class="input-wrapper">
+              <i class="fa-solid fa-user-pen input-icon"></i>
+              <input type="text" id="kegiatan-pelapor" placeholder="Contoh: Budi Santoso (Staf Lapangan)">
+            </div>
           </div>
-          <div class="input-wrapper">
-            <i class="fa-solid fa-map-location-dot input-icon align-top"></i>
-            <textarea id="kegiatan-alamat" rows="3"
-              placeholder="Masukkan alamat lengkap atau klik 'Dapatkan GPS' untuk mendeteksi lokasi secara otomatis..."></textarea>
-          </div>
-          <div id="gps-status" class="gps-status-info hidden">
-            <i class="fa-solid fa-spinner fa-spin"></i> Mendapatkan koordinat...
-          </div>
-          <div class="coordinates-display hidden" id="coords-container">
-            <span class="badge"><i class="fa-solid fa-compass"></i> Lat: <span id="lat-val">-</span></span>
-            <span class="badge"><i class="fa-solid fa-compass"></i> Lng: <span id="lng-val">-</span></span>
-          </div>
-        </div>
 
-        <div class="form-group">
-          <label for="kegiatan-pelapor">
-            <i class="fa-solid fa-user"></i> Pelapor / Petugas
-          </label>
-          <div class="input-wrapper">
-            <i class="fa-solid fa-user-pen input-icon"></i>
-            <input type="text" id="kegiatan-pelapor" placeholder="Contoh: Budi Santoso (Staf Lapangan)">
+          <div class="form-group">
+            <label for="kegiatan-logo">
+              <i class="fa-solid fa-building-shield"></i> Logo Instansi / Perusahaan (Opsional)
+            </label>
+            <div class="logo-upload-wrapper">
+              <div class="logo-preview-box" id="logo-preview-box">
+                <i class="fa-solid fa-image-portrait placeholder-icon" id="logo-placeholder-icon"></i>
+                <img id="logo-preview-img" class="hidden" alt="Logo Instansi">
+              </div>
+              <div class="logo-upload-actions">
+                <button type="button" id="btn-upload-logo" class="btn-secondary-sm">
+                  <i class="fa-solid fa-cloud-arrow-up"></i> Unggah Logo
+                </button>
+                <button type="button" id="btn-remove-logo" class="btn-danger-sm hidden">
+                  <i class="fa-solid fa-trash-can"></i> Hapus
+                </button>
+                <input type="file" id="kegiatan-logo" accept="image/*" class="hidden">
+              </div>
+            </div>
           </div>
         </div>
 
@@ -314,10 +337,14 @@
         <div class="pdf-preview-scroller">
           <div class="pdf-a4-page" id="pdf-content-to-render">
             <div class="pdf-header">
-              <div class="pdf-title-block">
-                <h2>DOKUMENTASI KEGIATAN</h2>
-                <div class="pdf-divider"></div>
+              <div class="pdf-kop-area" style="display: flex; align-items: center; gap: 16px; margin-bottom: 8px;">
+                <div class="pdf-header-logo-area" style="width: 50px; height: 50px; display: flex; justify-content: center; align-items: center; background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; overflow: hidden; flex-shrink: 0;">
+                  <i class="fa-solid fa-camera-retro" id="pdf-default-logo-icon" style="font-size: 24px; color: #0d9488;"></i>
+                  <img id="pdf-logo-img" class="hidden" alt="Logo Instansi" style="max-width: 100%; max-height: 100%; object-fit: contain;">
+                </div>
+                <h2 style="font-size: 18px; font-weight: 800; color: #0f766e; letter-spacing: 0.5px; margin: 0; text-align: left;">DOKUMENTASI KEGIATAN</h2>
               </div>
+              <div class="pdf-divider" style="height: 3px; background-color: #0d9488; margin-bottom: 12px; border-radius: 2px;"></div>
               <div class="pdf-meta-table">
                 <div class="pdf-meta-row" id="pdf-row-pelapor">
                   <span class="pdf-meta-label">Pelapor / Petugas</span>

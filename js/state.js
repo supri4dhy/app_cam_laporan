@@ -8,7 +8,8 @@ const appState = {
   pdfPhotoFit: 'cover',
   pdfPhotoSize: 'normal',
   coordinates: null,
-  address: ''
+  address: '',
+  logoDataURL: null // Menyimpan base64 logo instansi kustom
 };
 
 // DOM Elements Global Namespace
@@ -18,6 +19,10 @@ const elements = {
   kegiatanWaktu: document.getElementById('kegiatan-waktu'),
   kegiatanAlamat: document.getElementById('kegiatan-alamat'),
   kegiatanPelapor: document.getElementById('kegiatan-pelapor'),
+  kegiatanLogo: document.getElementById('kegiatan-logo'),
+  logoPreviewImg: document.getElementById('logo-preview-img'),
+  btnUploadLogo: document.getElementById('btn-upload-logo'),
+  btnRemoveLogo: document.getElementById('btn-remove-logo'),
   btnGps: document.getElementById('btn-gps'),
   gpsStatus: document.getElementById('gps-status'),
   coordsContainer: document.getElementById('coords-container'),
@@ -40,6 +45,8 @@ const elements = {
   pdfRowCoords: document.getElementById('pdf-row-coords'),
   pdfPhotosGridRender: document.getElementById('pdf-photos-grid-render'),
   pdfCurrentTimestamp: document.getElementById('pdf-current-timestamp'),
+  pdfLogoImg: document.getElementById('pdf-logo-img'),
+  pdfDefaultLogoIcon: document.getElementById('pdf-default-logo-icon'),
   
   // Action Buttons
   btnGeneratePdf: document.getElementById('btn-generate-pdf'),

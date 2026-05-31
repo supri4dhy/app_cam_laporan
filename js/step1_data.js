@@ -104,3 +104,113 @@ function handleGPSDetection() {
     }
   );
 }
+
+// 3. Inisialisasi Penanganan Unggah Logo Instansi
+function initLogoUpload() {
+  const btnUpload = elements.btnUploadLogo;
+  const btnRemove = elements.btnRemoveLogo;
+  const fileInput = elements.kegiatanLogo;
+  
+  if (!btnUpload || !fileInput) return;
+  
+  btnUpload.addEventListener('click', () => {
+    fileInput.click();
+  });
+  
+  fileInput.addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      processLogoFile(file);
+    }
+  });
+  
+  btnRemove.addEventListener('click', () => {
+    removeLogo();
+  });
+}
+
+function processLogoFile(file) {
+  if (!file.type.startsWith('image/')) {
+    alert("Berkas yang dipilih harus berupa gambar.");
+    return;
+  }
+  
+  const reader = new FileReader();
+  reader.onload = (event) => {
+    const img = new Image();
+    img.src = event.target.result;
+    
+    img.onload = () => {
+      // Kompresi logo ke resolusi wajar (max lebar/tinggi 200px) untuk watermark & kop
+      const canvas = document.createElement('canvas');
+      const maxDim = 200;
+      let width = img.width;
+      let height = img.height;
+      
+      if (width > height) {
+        if (width > maxDim) {
+          height = Math.round((height * maxDim) / width);
+          width = maxDim;
+        }
+      } else {
+        if (height > maxDim) {
+          width = Math.round((width * maxDim) / height);
+          height = maxDim;
+        }
+      }
+      
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0, width, height);
+      
+      // Simpan sebagai PNG transparan
+      const compressedLogo = canvas.toDataURL('image/png');
+      
+      appState.logoDataURL = compressedLogo;
+      
+      // Update UI Form Preview
+      if (elements.logoPreviewImg) {
+        elements.logoPreviewImg.src = compressedLogo;
+        elements.logoPreviewImg.classList.remove('hidden');
+      }
+      
+      const placeholderIcon = document.getElementById('logo-placeholder-icon');
+      if (placeholderIcon) {
+        placeholderIcon.classList.add('hidden');
+      }
+      
+      if (elements.btnRemoveLogo) {
+        elements.btnRemoveLogo.classList.remove('hidden');
+      }
+      
+      // Perbarui pratinjau PDF di Step 4
+      preparePDFPreview();
+    };
+  };
+  reader.readAsDataURL(file);
+}
+
+function removeLogo() {
+  appState.logoDataURL = null;
+  
+  if (elements.logoPreviewImg) {
+    elements.logoPreviewImg.src = '';
+    elements.logoPreviewImg.classList.add('hidden');
+  }
+  
+  const placeholderIcon = document.getElementById('logo-placeholder-icon');
+  if (placeholderIcon) {
+    placeholderIcon.classList.remove('hidden');
+  }
+  
+  if (elements.btnRemoveLogo) {
+    elements.btnRemoveLogo.classList.add('hidden');
+  }
+  if (elements.kegiatanLogo) {
+    elements.kegiatanLogo.value = '';
+  }
+  
+  // Perbarui pratinjau PDF di Step 4
+  preparePDFPreview();
+}

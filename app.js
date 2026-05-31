@@ -7,6 +7,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initTemplates();
   renderPhotoSlots();
   initVoiceInput();
+  initLogoUpload();
 });
 
 // 2. Event Listeners Global
