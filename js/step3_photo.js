@@ -231,8 +231,9 @@ function processImageFile(file, slotId, slotEl) {
       
       const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.8);
       
+      appState.photoAspectRatios[slotId] = img.width / img.height;
       appState.photos[slotId] = compressedDataUrl;
-      appState.photoTransforms[slotId] = { x: 0, y: 0, scale: 1.0 };
+      appState.photoTransforms[slotId] = { x: 0, y: 0, scale: 1.0, pctX: 0, pctY: 0 };
       
       updateSlotPreviewUI(slotEl, slotId, compressedDataUrl);
       attachDragHandlers(slotEl, slotId);
@@ -260,12 +261,43 @@ function updateSlotPreviewUI(slotEl, slotId, dataUrl) {
   const imgEl = document.createElement('img');
   imgEl.src = dataUrl;
   imgEl.className = 'photo-preview-img';
+  
+  // Hitung pemosisian Fit (Contain) secara dinamis agar foto tidak terpotong otomatis di awal
+  const r_img = appState.photoAspectRatios[slotId] || 1.0;
+  let W_box = slotEl.clientWidth;
+  let H_box = slotEl.clientHeight;
+  
+  if (!W_box || !H_box) {
+    if (slotEl.classList.contains('portrait-slot')) {
+      W_box = 180;
+      H_box = 320;
+    } else {
+      W_box = 320;
+      H_box = 180;
+    }
+  }
+  
+  let W_render, H_render, top_render, left_render;
+  
+  if (r_img >= 1.0) { // Landscape
+    W_render = W_box;
+    H_render = W_box / r_img;
+    top_render = (H_box - H_render) / 2;
+    left_render = 0;
+  } else { // Portrait
+    H_render = H_box;
+    W_render = H_box * r_img;
+    left_render = (W_box - W_render) / 2;
+    top_render = 0;
+  }
+  
   imgEl.style.position = 'absolute';
-  imgEl.style.top = '0';
-  imgEl.style.left = '0';
-  imgEl.style.width = '100%';
-  imgEl.style.height = '100%';
-  imgEl.style.objectFit = 'cover';
+  imgEl.style.top = top_render + 'px';
+  imgEl.style.left = left_render + 'px';
+  imgEl.style.width = W_render + 'px';
+  imgEl.style.height = H_render + 'px';
+  imgEl.style.objectFit = 'fill';
+  
   slotEl.appendChild(imgEl);
   
   const overlayEl = document.createElement('div');
@@ -281,7 +313,26 @@ function updateSlotPreviewUI(slotEl, slotId, dataUrl) {
   
   overlayEl.querySelector('.btn-change').addEventListener('click', (e) => {
     e.stopPropagation();
-    slotEl.querySelector('.file-input').click();
+    
+    const fileInputGallery = slotEl.querySelector('.file-input-gallery');
+    const fileInputCamera = slotEl.querySelector('.file-input-camera');
+    const isMobileDevice = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    
+    if (isMobileDevice) {
+      showMediaPicker((source) => {
+        if (source === 'camera') {
+          if (typeof window.bukaKameraInline === 'function') {
+            window.bukaKameraInline(slotId, slotEl);
+          } else {
+            fileInputCamera.click();
+          }
+        } else {
+          fileInputGallery.click();
+        }
+      });
+    } else {
+      fileInputGallery.click();
+    }
   });
   
   overlayEl.querySelector('.btn-delete').addEventListener('click', (e) => {
@@ -297,12 +348,14 @@ function attachDragHandlers(slotEl, slotId) {
   const img = slotEl.querySelector('.photo-preview-img');
   if (!img) return;
   
-  const transform = appState.photoTransforms[slotId] || { x: 0, y: 0, scale: 1.0 };
+  const transform = appState.photoTransforms[slotId] || { x: 0, y: 0, scale: 1.0, pctX: 0, pctY: 0 };
   
   // Terapkan batas geser awal saat render
-  const bounds = calculateBounds(img, slotEl, transform.scale);
+  const bounds = calculateBounds(img, slotEl, transform.scale, slotId);
   transform.x = Math.max(-bounds.maxX, Math.min(bounds.maxX, transform.x));
   transform.y = Math.max(-bounds.maxY, Math.min(bounds.maxY, transform.y));
+  transform.pctX = bounds.maxX > 0 ? transform.x / bounds.maxX : 0;
+  transform.pctY = bounds.maxY > 0 ? transform.y / bounds.maxY : 0;
   appState.photoTransforms[slotId] = transform;
   
   img.style.transform = `translate(${transform.x}px, ${transform.y}px) scale(${transform.scale})`;
@@ -357,12 +410,14 @@ function attachDragHandlers(slotEl, slotId) {
       transform.scale = newScale;
       
       // Amankan pergeseran agar tidak bocor dari batas slot foto
-      const bounds = calculateBounds(img, slotEl, newScale);
+      const bounds = calculateBounds(img, slotEl, newScale, slotId);
       translateX = Math.max(-bounds.maxX, Math.min(bounds.maxX, translateX));
       translateY = Math.max(-bounds.maxY, Math.min(bounds.maxY, translateY));
       
       transform.x = translateX;
       transform.y = translateY;
+      transform.pctX = bounds.maxX > 0 ? translateX / bounds.maxX : 0;
+      transform.pctY = bounds.maxY > 0 ? translateY / bounds.maxY : 0;
       appState.photoTransforms[slotId] = transform;
       
       img.style.transform = `translate(${translateX}px, ${translateY}px) scale(${newScale})`;
@@ -380,9 +435,15 @@ function attachDragHandlers(slotEl, slotId) {
       let rawY = clientY - startY;
       
       // Amankan pergeseran gambar dari batas tepi slot foto
-      const bounds = calculateBounds(img, slotEl, transform.scale);
+      const bounds = calculateBounds(img, slotEl, transform.scale, slotId);
       translateX = Math.max(-bounds.maxX, Math.min(bounds.maxX, rawX));
       translateY = Math.max(-bounds.maxY, Math.min(bounds.maxY, rawY));
+      
+      transform.x = translateX;
+      transform.y = translateY;
+      transform.pctX = bounds.maxX > 0 ? translateX / bounds.maxX : 0;
+      transform.pctY = bounds.maxY > 0 ? translateY / bounds.maxY : 0;
+      appState.photoTransforms[slotId] = transform;
       
       img.style.transform = `translate(${translateX}px, ${translateY}px) scale(${transform.scale})`;
     }
@@ -394,8 +455,12 @@ function attachDragHandlers(slotEl, slotId) {
       isPinching = false;
       img.style.cursor = 'grab';
       
+      // Hitung ulang bounds untuk menyimpan pctX dan pctY yang final
+      const bounds = calculateBounds(img, slotEl, transform.scale, slotId);
       transform.x = translateX;
       transform.y = translateY;
+      transform.pctX = bounds.maxX > 0 ? translateX / bounds.maxX : 0;
+      transform.pctY = bounds.maxY > 0 ? translateY / bounds.maxY : 0;
       appState.photoTransforms[slotId] = transform;
       
       preparePDFPreview();
@@ -424,12 +489,14 @@ function attachDragHandlers(slotEl, slotId) {
     
     transform.scale = newScale;
     
-    const bounds = calculateBounds(img, slotEl, newScale);
+    const bounds = calculateBounds(img, slotEl, newScale, slotId);
     translateX = Math.max(-bounds.maxX, Math.min(bounds.maxX, translateX));
     translateY = Math.max(-bounds.maxY, Math.min(bounds.maxY, translateY));
     
     transform.x = translateX;
     transform.y = translateY;
+    transform.pctX = bounds.maxX > 0 ? translateX / bounds.maxX : 0;
+    transform.pctY = bounds.maxY > 0 ? translateY / bounds.maxY : 0;
     appState.photoTransforms[slotId] = transform;
     
     img.style.transform = `translate(${translateX}px, ${translateY}px) scale(${newScale})`;
@@ -452,27 +519,19 @@ function getDistance(touch1, touch2) {
 }
 
 // Helper: Hitung batas geser maksimum (maxX, maxY) agar gambar tidak meninggalkan celah di boks
-function calculateBounds(imgEl, slotEl, scale) {
-  const W_box = slotEl.clientWidth;
-  const H_box = slotEl.clientHeight;
+function calculateBounds(imgEl, slotEl, scale, slotId) {
+  const W_box = slotEl.clientWidth || 300;
+  const H_box = slotEl.clientHeight || 168.75;
+  const r_img = appState.photoAspectRatios[slotId] || 1.0;
   
-  // Ambil resolusi asli gambar
-  const W_img = imgEl.naturalWidth || W_box;
-  const H_img = imgEl.naturalHeight || H_box;
+  let W_render, H_render;
   
-  const r_box = W_box / H_box;
-  const r_img = W_img / H_img;
-  
-  let W_render = W_box;
-  let H_render = H_box;
-  
-  // Hitung dimensi render aktual karena menggunakan object-fit: cover
-  if (r_img > r_box) {
-    H_render = H_box;
-    W_render = H_box * r_img;
-  } else {
+  if (r_img >= 1.0) { // Landscape
     W_render = W_box;
     H_render = W_box / r_img;
+  } else { // Portrait
+    H_render = H_box;
+    W_render = H_box * r_img;
   }
   
   // Hitung batas geser X & Y maksimal dari titik tengah
@@ -552,6 +611,10 @@ function showMediaPicker(onSourceSelected) {
   const close = () => {
     backdrop.classList.remove('show');
     sheet.classList.remove('show');
+    backdrop.style.opacity = '0';
+    backdrop.style.pointerEvents = 'none';
+    sheet.style.transform = 'translateY(100%)';
+    sheet.style.pointerEvents = 'none';
     setTimeout(() => {
       backdrop.remove();
       sheet.remove();
@@ -683,8 +746,8 @@ function tutupKameraInline() {
   }
 }
 
-// Inisialisasi event listener tombol modal kamera inline kustom
-document.addEventListener('DOMContentLoaded', () => {
+// Inisialisasi event listener tombol modal kamera inline kustom secara tangguh
+function initCameraControls() {
   const btnClose = document.getElementById('btn-camera-close');
   const btnSwitch = document.getElementById('btn-camera-switch');
   const btnShutter = document.getElementById('btn-camera-shutter');
@@ -703,7 +766,13 @@ document.addEventListener('DOMContentLoaded', () => {
   if (btnShutter) {
     btnShutter.addEventListener('click', ambilFotoKameraInline);
   }
-});
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initCameraControls);
+} else {
+  initCameraControls();
+}
 
 function ambilFotoKameraInline() {
   const video = document.getElementById('camera-stream');
@@ -771,8 +840,9 @@ function processCapturedPhotoData(dataUrl, slotId, slotEl) {
     
     const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.8);
     
+    appState.photoAspectRatios[slotId] = img.width / img.height;
     appState.photos[slotId] = compressedDataUrl;
-    appState.photoTransforms[slotId] = { x: 0, y: 0, scale: 1.0 };
+    appState.photoTransforms[slotId] = { x: 0, y: 0, scale: 1.0, pctX: 0, pctY: 0 };
     
     updateSlotPreviewUI(slotEl, slotId, compressedDataUrl);
     attachDragHandlers(slotEl, slotId);

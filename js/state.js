@@ -5,6 +5,7 @@ const appState = {
   photos: {}, // Menyimpan base64 dataURL untuk setiap slot foto
   photoCaptions: {}, // Menyimpan keterangan kustom untuk tiap slot foto
   photoTransforms: {}, // Menyimpan data geser dan perbesar { x: 0, y: 0, scale: 1.0 }
+  photoAspectRatios: {}, // Menyimpan aspek rasio asli gambar {[slotId]: ratio}
   pdfPhotoFit: 'cover',
   pdfPhotoSize: 'normal',
   coordinates: null,
@@ -117,6 +118,7 @@ window.simpanDraftLaporan = function() {
       photos: appState.photos,
       photoCaptions: appState.photoCaptions,
       photoTransforms: appState.photoTransforms,
+      photoAspectRatios: appState.photoAspectRatios,
       pdfPhotoFit: appState.pdfPhotoFit,
       pdfPhotoSize: appState.pdfPhotoSize,
       coordinates: appState.coordinates,
@@ -155,6 +157,7 @@ window.muatDraftLaporan = function() {
     appState.photos = draft.photos || {};
     appState.photoCaptions = draft.photoCaptions || {};
     appState.photoTransforms = draft.photoTransforms || {};
+    appState.photoAspectRatios = draft.photoAspectRatios || {};
     appState.pdfPhotoFit = draft.pdfPhotoFit || 'cover';
     appState.pdfPhotoSize = draft.pdfPhotoSize || 'normal';
     appState.coordinates = draft.coordinates || null;
@@ -204,6 +207,7 @@ window.hapusDraftLaporan = function() {
     appState.photos = {};
     appState.photoCaptions = {};
     appState.photoTransforms = {};
+    appState.photoAspectRatios = {};
     appState.pdfPhotoFit = 'cover';
     appState.pdfPhotoSize = 'normal';
     appState.coordinates = null;

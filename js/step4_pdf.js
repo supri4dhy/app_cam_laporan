@@ -133,13 +133,46 @@ function renderPDFPhotosLayout() {
   }
 }
 
+// Helper: Dapatkan dimensi piksel boks foto PDF berdasarkan template dan indeks slot
+function getPDFBoxDimensions(t, index) {
+  let w = 300;
+  let h = 168.75;
+  
+  if (t === '2-landscape') {
+    w = 620;
+    h = 348.75;
+  } else if (t === '3-landscape') {
+    w = 440;
+    h = 247.5;
+  } else if (t === '3-mix') {
+    if (index === 0 || index === 1) {
+      w = 215;
+      h = 382.2;
+    } else {
+      w = 446;
+      h = 250.875;
+    }
+  } else if (t === '4-portrait') {
+    w = 220;
+    h = 391.1;
+  } else if (t === '2-portrait') {
+    w = 280;
+    h = 497.7;
+  } else if (t === '4-landscape') {
+    w = 300;
+    h = 168.75;
+  }
+  
+  return { w, h };
+}
+
 // 3. Membuat Element Box Foto untuk PDF dengan Watermark Logo & Timestamp
 function createPDFPhotoBox(index, captionText, isPortrait) {
   const box = document.createElement('div');
   box.className = 'pdf-photo-box';
   
   const photoSrc = appState.photos[index];
-  const transform = appState.photoTransforms[index] || { x: 0, y: 0, scale: 1.0 };
+  const transform = appState.photoTransforms[index] || { x: 0, y: 0, scale: 1.0, pctX: 0, pctY: 0 };
   
   // Siapkan data untuk watermark
   const tanggalInput = elements.kegiatanTanggal.value;
@@ -167,9 +200,42 @@ function createPDFPhotoBox(index, captionText, isPortrait) {
   }
   
   if (photoSrc) {
+    const r_img = appState.photoAspectRatios[index] || 1.0;
+    const dims = getPDFBoxDimensions(appState.selectedTemplate, index);
+    const W_box_pdf = dims.w;
+    const H_box_pdf = dims.h;
+    
+    let W_render_pdf, H_render_pdf, top_render_pdf, left_render_pdf;
+    
+    if (r_img >= 1.0) { // Landscape
+      W_render_pdf = W_box_pdf;
+      H_render_pdf = W_box_pdf / r_img;
+      top_render_pdf = (H_box_pdf - H_render_pdf) / 2;
+      left_render_pdf = 0;
+    } else { // Portrait
+      H_render_pdf = H_box_pdf;
+      W_render_pdf = H_box_pdf * r_img;
+      left_render_pdf = (W_box_pdf - W_render_pdf) / 2;
+      top_render_pdf = 0;
+    }
+    
+    // Hitung batas geser PDF
+    const scale = transform.scale || 1.0;
+    const W_zoom_pdf = W_render_pdf * scale;
+    const H_zoom_pdf = H_render_pdf * scale;
+    
+    const maxX_pdf = Math.max(0, (W_zoom_pdf - W_box_pdf) / 2);
+    const maxY_pdf = Math.max(0, (H_zoom_pdf - H_box_pdf) / 2);
+    
+    // Hitung pergeseran PDF berdasarkan persentase pergeseran di Step 3
+    const pctX = transform.pctX || 0;
+    const pctY = transform.pctY || 0;
+    const x_pdf = pctX * maxX_pdf;
+    const y_pdf = pctY * maxY_pdf;
+
     box.innerHTML = `
       <div class="pdf-photo-img-wrapper" style="overflow: hidden; position: relative; width: 100%; height: 100%; flex-grow: 1;">
-        <img src="${photoSrc}" alt="Foto ${index + 1}" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; transform: translate(${transform.x}px, ${transform.y}px) scale(${transform.scale}); transform-origin: center;">
+        <img src="${photoSrc}" alt="Foto ${index + 1}" style="position: absolute; top: ${top_render_pdf}px; left: ${left_render_pdf}px; width: ${W_render_pdf}px; height: ${H_render_pdf}px; object-fit: fill; transform: translate(${x_pdf}px, ${y_pdf}px) scale(${scale}); transform-origin: center;">
         <div class="photo-watermark">
           <div class="watermark-row-main">
             ${logoHtml}
