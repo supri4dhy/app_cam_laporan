@@ -5,12 +5,13 @@
 
 @media (max-width: 768px) {
 
-  /* ----- RESET BODY AGAR BISA SCROLL ----- */
+  /* ----- RESET BODY AGAR BISA SCROLL PROPORSIAL ----- */
   html, body {
     overflow-x: hidden !important;
     overflow-y: auto !important;
-    height: auto !important;
-    min-height: 100vh !important;
+    height: 100% !important;
+    min-height: 100dvh !important; /* Menggunakan Dynamic Viewport Height */
+    background-color: #f1f5f9 !important;
   }
 
   /* ----- APP CONTAINER ----- */
@@ -22,13 +23,23 @@
     max-height: none !important;
     gap: 6px !important;
     box-sizing: border-box !important;
+    display: flex !important;
+    flex-direction: column !important;
     /* Ruang untuk bottom nav */
     padding-bottom: calc(72px + env(safe-area-inset-bottom)) !important;
   }
 
-  /* ----- HEADER ----- */
+  /* ----- HEADER (Sticky agar tidak menghilang saat scroll) ----- */
   .app-header {
-    padding: 2px 0 !important;
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 100 !important;
+    background: rgba(241, 245, 249, 0.8) !important;
+    backdrop-filter: blur(12px) !important;
+    -webkit-backdrop-filter: blur(12px) !important;
+    padding: 6px 4px !important;
+    border-bottom: 1px solid rgba(226, 232, 240, 0.8) !important;
+    margin: -8px -8px 4px -8px !important; /* Kompensasi padding container */
     flex-shrink: 0 !important;
   }
 
