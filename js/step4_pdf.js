@@ -232,6 +232,10 @@ function generatePDFReport() {
       
       hideLoading();
       showToast("Dokumentasi PDF berhasil dibuat dan diunduh ke perangkat Anda!", "success");
+      
+      if (typeof window.bersihkanDraftStorageOnly === 'function') {
+        window.bersihkanDraftStorageOnly();
+      }
     }).catch(err => {
       console.error("Gagal membuat PDF:", err);
       window.scrollTo(0, originalScrollTop);

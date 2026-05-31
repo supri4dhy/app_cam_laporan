@@ -91,11 +91,174 @@ const elements = {
   // Action Buttons
   btnGeneratePdf: document.getElementById('btn-generate-pdf'),
   btnShareWa: document.getElementById('btn-share-wa'),
+  btnResetDraft: document.getElementById('btn-reset-draft'),
   
   // PWA Install Elements
   pwaInstallBanner: document.getElementById('btn-pwa-install'),
   btnPwaInstall: document.getElementById('btn-pwa-install'),
   btnPwaDismiss: null
+};
+
+// =========================================================
+//  DRAFT LAPORAN REALTIME (LocalStorage)
+// =========================================================
+const DRAFT_KEY = 'laporcam_draft';
+
+window.simpanDraftLaporan = function() {
+  try {
+    const draftData = {
+      nama: elements.kegiatanNama ? elements.kegiatanNama.value : '',
+      tanggal: elements.kegiatanTanggal ? elements.kegiatanTanggal.value : '',
+      waktu: elements.kegiatanWaktu ? elements.kegiatanWaktu.value : '',
+      alamat: elements.kegiatanAlamat ? elements.kegiatanAlamat.value : '',
+      pelapor: elements.kegiatanPelapor ? elements.kegiatanPelapor.value : '',
+      currentStep: appState.currentStep,
+      selectedTemplate: appState.selectedTemplate,
+      photos: appState.photos,
+      photoCaptions: appState.photoCaptions,
+      photoTransforms: appState.photoTransforms,
+      pdfPhotoFit: appState.pdfPhotoFit,
+      pdfPhotoSize: appState.pdfPhotoSize,
+      coordinates: appState.coordinates,
+      address: appState.address
+    };
+    
+    localStorage.setItem(DRAFT_KEY, JSON.stringify(draftData));
+    
+    // Tampilkan tombol "Mulai Baru" jika ada isi draf yang signifikan
+    if (elements.btnResetDraft) {
+      elements.btnResetDraft.classList.remove('hidden');
+    }
+  } catch (e) {
+    console.warn('Gagal menyimpan draf laporan ke localStorage:', e);
+  }
+};
+
+window.muatDraftLaporan = function() {
+  try {
+    const raw = localStorage.getItem(DRAFT_KEY);
+    if (!raw) return false;
+    
+    const draft = JSON.parse(raw);
+    if (!draft) return false;
+    
+    // Isi nilai input form
+    if (elements.kegiatanNama) elements.kegiatanNama.value = draft.nama || '';
+    if (elements.kegiatanTanggal) elements.kegiatanTanggal.value = draft.tanggal || '';
+    if (elements.kegiatanWaktu) elements.kegiatanWaktu.value = draft.waktu || '';
+    if (elements.kegiatanAlamat) elements.kegiatanAlamat.value = draft.alamat || '';
+    if (elements.kegiatanPelapor) elements.kegiatanPelapor.value = draft.pelapor || '';
+    
+    // Restore state global
+    appState.currentStep = draft.currentStep || 1;
+    appState.selectedTemplate = draft.selectedTemplate || '2-landscape';
+    appState.photos = draft.photos || {};
+    appState.photoCaptions = draft.photoCaptions || {};
+    appState.photoTransforms = draft.photoTransforms || {};
+    appState.pdfPhotoFit = draft.pdfPhotoFit || 'cover';
+    appState.pdfPhotoSize = draft.pdfPhotoSize || 'normal';
+    appState.coordinates = draft.coordinates || null;
+    appState.address = draft.address || '';
+    
+    // Sinkronkan UI Koordinat GPS
+    if (appState.coordinates && elements.coordsContainer && elements.latVal && elements.lngVal) {
+      elements.latVal.textContent = Number(appState.coordinates.lat).toFixed(6);
+      elements.lngVal.textContent = Number(appState.coordinates.lng).toFixed(6);
+      elements.coordsContainer.classList.remove('hidden');
+    } else if (elements.coordsContainer) {
+      elements.coordsContainer.classList.add('hidden');
+    }
+    
+    // Sinkronkan Dropdown Settings PDF
+    if (elements.pdfPhotoFit) elements.pdfPhotoFit.value = appState.pdfPhotoFit;
+    if (elements.pdfPhotoSize) elements.pdfPhotoSize.value = appState.pdfPhotoSize;
+    
+    // Tampilkan tombol "Mulai Baru"
+    if (elements.btnResetDraft) {
+      elements.btnResetDraft.classList.remove('hidden');
+    }
+    
+    return true;
+  } catch (e) {
+    console.error('Gagal memuat draf laporan:', e);
+    return false;
+  }
+};
+
+window.hapusDraftLaporan = function() {
+  try {
+    localStorage.removeItem(DRAFT_KEY);
+    
+    // Reset input form
+    if (elements.kegiatanNama) elements.kegiatanNama.value = '';
+    if (elements.kegiatanAlamat) elements.kegiatanAlamat.value = '';
+    
+    // Reset DateTime
+    if (typeof initDateTime === 'function') {
+      initDateTime();
+    }
+    
+    // Reset state
+    appState.currentStep = 1;
+    appState.selectedTemplate = '2-landscape';
+    appState.photos = {};
+    appState.photoCaptions = {};
+    appState.photoTransforms = {};
+    appState.pdfPhotoFit = 'cover';
+    appState.pdfPhotoSize = 'normal';
+    appState.coordinates = null;
+    appState.address = '';
+    
+    // Sembunyikan koordinat GPS
+    if (elements.coordsContainer) {
+      elements.coordsContainer.classList.add('hidden');
+    }
+    
+    // Muat nama pelapor tersimpan (jika ada) sebagai default
+    const savedPelapor = muatPelaporTersimpan();
+    if (elements.kegiatanPelapor) {
+      elements.kegiatanPelapor.value = savedPelapor;
+    }
+    
+    // Sinkronkan pilihan template di UI
+    const cards = document.querySelectorAll('.template-card');
+    cards.forEach(card => {
+      card.classList.remove('selected');
+      if (card.dataset.template === appState.selectedTemplate) {
+        card.classList.add('selected');
+      }
+    });
+    
+    // Sembunyikan tombol "Mulai Baru"
+    if (elements.btnResetDraft) {
+      elements.btnResetDraft.classList.add('hidden');
+    }
+    
+    // Render ulang slot foto kosong
+    if (typeof renderPhotoSlots === 'function') {
+      renderPhotoSlots();
+    }
+    
+    // Kembalikan ke step 1
+    if (typeof goToStep === 'function') {
+      goToStep(1);
+    }
+    
+    showToast('Laporan baru telah dimulai. Draf lama dihapus.', 'success');
+  } catch (e) {
+    console.error('Gagal menghapus draf laporan:', e);
+  }
+};
+
+window.bersihkanDraftStorageOnly = function() {
+  try {
+    localStorage.removeItem(DRAFT_KEY);
+    if (elements.btnResetDraft) {
+      elements.btnResetDraft.classList.add('hidden');
+    }
+  } catch (e) {
+    console.warn('Gagal membersihkan draf storage:', e);
+  }
 };
 
 // Sistem Notifikasi Toast Kustom Global

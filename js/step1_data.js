@@ -61,6 +61,7 @@ function handleGPSDetection() {
             elements.kegiatanAlamat.value = `Koordinat: ${lat}, ${lng}`;
             appState.address = `Koordinat: ${lat}, ${lng}`;
           }
+          window.simpanDraftLaporan();
         } else {
           throw new Error("Gagal mengambil data alamat");
         }
@@ -69,6 +70,7 @@ function handleGPSDetection() {
         // Fallback jika API bermasalah atau limit
         elements.kegiatanAlamat.value = `Koordinat: ${lat}, ${lng}\n(Gagal mendapatkan alamat otomatis. Silakan masukkan alamat manual jika diperlukan)`;
         appState.address = `Koordinat: ${lat}, ${lng}`;
+        window.simpanDraftLaporan();
       } finally {
         elements.gpsStatus.classList.add('hidden');
         elements.btnGps.disabled = false;
@@ -161,6 +163,29 @@ function initLogoUpload() {
       simpanPelapor(elements.kegiatanPelapor.value);
     });
   }
+
+  // Simpan draf laporan otomatis secara real-time
+  const formInputs = [
+    elements.kegiatanNama,
+    elements.kegiatanTanggal,
+    elements.kegiatanWaktu,
+    elements.kegiatanAlamat,
+    elements.kegiatanPelapor
+  ];
+  formInputs.forEach(input => {
+    if (input) {
+      input.addEventListener('input', () => {
+        if (typeof window.simpanDraftLaporan === 'function') {
+          window.simpanDraftLaporan();
+        }
+      });
+      input.addEventListener('change', () => {
+        if (typeof window.simpanDraftLaporan === 'function') {
+          window.simpanDraftLaporan();
+        }
+      });
+    }
+  });
 }
 
 function processLogoFile(file) {

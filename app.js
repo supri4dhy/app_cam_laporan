@@ -8,6 +8,15 @@ document.addEventListener('DOMContentLoaded', () => {
   renderPhotoSlots();
   initVoiceInput();
   initLogoUpload();
+  
+  // Coba muat draf laporan lama
+  if (typeof window.muatDraftLaporan === 'function') {
+    const draftLoaded = window.muatDraftLaporan();
+    if (draftLoaded) {
+      goToStep(appState.currentStep);
+      showToast(`Draf laporan sebelumnya berhasil dipulihkan (Langkah ${appState.currentStep}).`, 'success');
+    }
+  }
 });
 
 // 2. Event Listeners Global
@@ -15,6 +24,17 @@ function initEventListeners() {
   // Tombol deteksi GPS di Step 1
   if (elements.btnGps) {
     elements.btnGps.addEventListener('click', handleGPSDetection);
+  }
+  
+  // Tombol reset draf / mulai baru
+  if (elements.btnResetDraft) {
+    elements.btnResetDraft.addEventListener('click', () => {
+      if (confirm("Apakah Anda yakin ingin menghapus seluruh data draf dan memulai laporan baru dari awal?")) {
+        if (typeof window.hapusDraftLaporan === 'function') {
+          window.hapusDraftLaporan();
+        }
+      }
+    });
   }
   
   // Tombol aksi di Step 4
@@ -30,6 +50,9 @@ function initEventListeners() {
     elements.pdfPhotoFit.addEventListener('change', (e) => {
       appState.pdfPhotoFit = e.target.value;
       preparePDFPreview();
+      if (typeof window.simpanDraftLaporan === 'function') {
+        window.simpanDraftLaporan();
+      }
     });
   }
 
@@ -37,6 +60,9 @@ function initEventListeners() {
     elements.pdfPhotoSize.addEventListener('change', (e) => {
       appState.pdfPhotoSize = e.target.value;
       preparePDFPreview();
+      if (typeof window.simpanDraftLaporan === 'function') {
+        window.simpanDraftLaporan();
+      }
     });
   }
 }
@@ -102,6 +128,11 @@ function goToStep(stepNumber) {
   // Jika berpindah ke Step 4 (Pratinjau), siapkan layout pratinjau PDF
   if (stepNumber === 4) {
     preparePDFPreview();
+  }
+  
+  // Simpan draf laporan setiap kali melangkah ke langkah lain
+  if (typeof window.simpanDraftLaporan === 'function') {
+    window.simpanDraftLaporan();
   }
   
   // Scroll halaman ke atas agar nyaman di mobile

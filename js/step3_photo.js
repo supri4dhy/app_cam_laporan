@@ -93,7 +93,11 @@ function renderPhotoSlots() {
         // Panggil Bottom Sheet media picker kustom
         showMediaPicker((source) => {
           if (source === 'camera') {
-            fileInputCamera.click();
+            if (typeof window.bukaKameraInline === 'function') {
+              window.bukaKameraInline(slot.id, slotEl);
+            } else {
+              fileInputCamera.click();
+            }
           } else {
             fileInputGallery.click();
           }
@@ -159,12 +163,21 @@ function renderPhotoSlots() {
       appState.photoTransforms[slot.id] = transform;
       preparePDFPreview();
     });
+
+    zoomRangeInput.addEventListener('change', () => {
+      if (typeof window.simpanDraftLaporan === 'function') {
+        window.simpanDraftLaporan();
+      }
+    });
     
     // Simpan keterangan ke state saat diketik
     const captionInput = controlsGroup.querySelector('.photo-caption-input');
     captionInput.addEventListener('input', (e) => {
       appState.photoCaptions[slot.id] = e.target.value.trim();
       preparePDFPreview();
+      if (typeof window.simpanDraftLaporan === 'function') {
+        window.simpanDraftLaporan();
+      }
     });
     
     wrapperEl.appendChild(slotEl);
@@ -225,6 +238,9 @@ function processImageFile(file, slotId, slotEl) {
       attachDragHandlers(slotEl, slotId);
       
       hideLoading();
+      if (typeof window.simpanDraftLaporan === 'function') {
+        window.simpanDraftLaporan();
+      }
     };
   };
   
@@ -383,6 +399,9 @@ function attachDragHandlers(slotEl, slotId) {
       appState.photoTransforms[slotId] = transform;
       
       preparePDFPreview();
+      if (typeof window.simpanDraftLaporan === 'function') {
+        window.simpanDraftLaporan();
+      }
     }
   }
   
@@ -419,6 +438,9 @@ function attachDragHandlers(slotEl, slotId) {
     if (slider) slider.value = newScale;
     
     preparePDFPreview();
+    if (typeof window.simpanDraftLaporan === 'function') {
+      window.simpanDraftLaporan();
+    }
   }, { passive: false });
 }
 
@@ -480,6 +502,9 @@ function deletePhoto(slotId, slotEl) {
   if (fileInputCamera) fileInputCamera.value = '';
   
   preparePDFPreview();
+  if (typeof window.simpanDraftLaporan === 'function') {
+    window.simpanDraftLaporan();
+  }
 }
 
 // 6. Implementasi Bottom Sheet Picker untuk HP (Camera vs Gallery)
@@ -545,4 +570,222 @@ function showMediaPicker(onSourceSelected) {
     close();
     onSourceSelected('gallery');
   });
+}
+
+// =========================================================
+//  KAMERA INLINE HTML5 WEBRTC (ANTI-CRASH MEMORI)
+// =========================================================
+let activeCameraStream = null;
+let currentFacingMode = 'environment';
+let currentActiveSlotId = null;
+let currentActiveSlotEl = null;
+
+window.bukaKameraInline = function(slotId, slotEl) {
+  currentActiveSlotId = slotId;
+  currentActiveSlotEl = slotEl;
+  
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+    showToast("Kamera inline tidak didukung di browser Anda. Membuka kamera bawaan HP...", "warning");
+    const fileInputCamera = slotEl.querySelector('.file-input-camera');
+    if (fileInputCamera) fileInputCamera.click();
+    return;
+  }
+  
+  const modal = document.getElementById('camera-modal');
+  if (modal) {
+    modal.classList.remove('hidden');
+    setTimeout(() => {
+      modal.classList.add('show');
+    }, 10);
+  }
+  
+  currentFacingMode = 'environment'; // Default mulai dengan kamera belakang
+  startCameraStream(currentFacingMode);
+};
+
+function startCameraStream(facingMode) {
+  stopCameraStream();
+  
+  const video = document.getElementById('camera-stream');
+  if (!video) return;
+  
+  showToast("Mengaktifkan kamera...", "info");
+  
+  // Pilihan resolusi yang wajar (1280x720) demi hemat RAM dan kualitas tajam
+  const constraints = {
+    video: {
+      facingMode: facingMode,
+      width: { ideal: 1280 },
+      height: { ideal: 720 }
+    },
+    audio: false
+  };
+  
+  navigator.mediaDevices.getUserMedia(constraints)
+    .then(stream => {
+      video.srcObject = stream;
+      activeCameraStream = stream;
+      
+      // Jika kamera depan aktif, cerminkan videonya secara visual (efek cermin)
+      if (facingMode === 'user') {
+        video.classList.add('user-facing');
+      } else {
+        video.classList.remove('user-facing');
+      }
+    })
+    .catch(err => {
+      console.warn("Gagal mengaktifkan kamera dengan facingMode:", facingMode, err);
+      
+      // Fallback 1: Coba tanpa constraint resolusi ideal jika gagal
+      navigator.mediaDevices.getUserMedia({ video: { facingMode: facingMode }, audio: false })
+        .then(stream => {
+          video.srcObject = stream;
+          activeCameraStream = stream;
+          if (facingMode === 'user') {
+            video.classList.add('user-facing');
+          } else {
+            video.classList.remove('user-facing');
+          }
+        })
+        .catch(err2 => {
+          console.error("Gagal total mengaktifkan kamera kustom:", err2);
+          showToast("Gagal mengakses kamera kustom. Membuka kamera bawaan HP...", "warning");
+          tutupKameraInline();
+          
+          // Fallback 2: Buka input kamera bawaan HP
+          if (currentActiveSlotEl) {
+            const fileInputCamera = currentActiveSlotEl.querySelector('.file-input-camera');
+            if (fileInputCamera) fileInputCamera.click();
+          }
+        });
+    });
+}
+
+function stopCameraStream() {
+  const video = document.getElementById('camera-stream');
+  if (video) {
+    video.srcObject = null;
+  }
+  if (activeCameraStream) {
+    activeCameraStream.getTracks().forEach(track => track.stop());
+    activeCameraStream = null;
+  }
+}
+
+function tutupKameraInline() {
+  stopCameraStream();
+  const modal = document.getElementById('camera-modal');
+  if (modal) {
+    modal.classList.remove('show');
+    setTimeout(() => {
+      modal.classList.add('hidden');
+    }, 300);
+  }
+}
+
+// Inisialisasi event listener tombol modal kamera inline kustom
+document.addEventListener('DOMContentLoaded', () => {
+  const btnClose = document.getElementById('btn-camera-close');
+  const btnSwitch = document.getElementById('btn-camera-switch');
+  const btnShutter = document.getElementById('btn-camera-shutter');
+  
+  if (btnClose) {
+    btnClose.addEventListener('click', tutupKameraInline);
+  }
+  
+  if (btnSwitch) {
+    btnSwitch.addEventListener('click', () => {
+      currentFacingMode = currentFacingMode === 'environment' ? 'user' : 'environment';
+      startCameraStream(currentFacingMode);
+    });
+  }
+  
+  if (btnShutter) {
+    btnShutter.addEventListener('click', ambilFotoKameraInline);
+  }
+});
+
+function ambilFotoKameraInline() {
+  const video = document.getElementById('camera-stream');
+  const canvas = document.getElementById('camera-capture-canvas');
+  if (!video || !canvas || !activeCameraStream) return;
+  
+  // Ambil resolusi video stream yang sebenarnya
+  const width = video.videoWidth || video.clientWidth || 1280;
+  const height = video.videoHeight || video.clientHeight || 720;
+  
+  canvas.width = width;
+  canvas.height = height;
+  
+  const ctx = canvas.getContext('2d');
+  
+  // Jika kamera depan, cerminkan gambarnya secara horisontal agar WYSIWYG
+  if (currentFacingMode === 'user') {
+    ctx.translate(width, 0);
+    ctx.scale(-1, 1);
+  }
+  
+  ctx.drawImage(video, 0, 0, width, height);
+  
+  // Reset transform canvas kembali ke normal
+  ctx.setTransform(1, 0, 0, 1, 0, 0);
+  
+  // Kompresi hasil tangkapan foto ke format jpeg
+  const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
+  
+  // Simpan foto ke state
+  if (currentActiveSlotId !== null && currentActiveSlotEl !== null) {
+    processCapturedPhotoData(dataUrl, currentActiveSlotId, currentActiveSlotEl);
+  }
+  
+  tutupKameraInline();
+}
+
+function processCapturedPhotoData(dataUrl, slotId, slotEl) {
+  showLoading("Memproses & memuat foto...");
+  
+  const img = new Image();
+  img.src = dataUrl;
+  img.onload = () => {
+    const canvas = document.createElement('canvas');
+    const maxDim = 1200; // resolusi maksimal gambar
+    let width = img.width;
+    let height = img.height;
+    
+    if (width > height) {
+      if (width > maxDim) {
+        height = Math.round((height * maxDim) / width);
+        width = maxDim;
+      }
+    } else {
+      if (height > maxDim) {
+        width = Math.round((width * maxDim) / height);
+        height = maxDim;
+      }
+    }
+    
+    canvas.width = width;
+    canvas.height = height;
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(img, 0, 0, width, height);
+    
+    const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.8);
+    
+    appState.photos[slotId] = compressedDataUrl;
+    appState.photoTransforms[slotId] = { x: 0, y: 0, scale: 1.0 };
+    
+    updateSlotPreviewUI(slotEl, slotId, compressedDataUrl);
+    attachDragHandlers(slotEl, slotId);
+    
+    hideLoading();
+    
+    if (typeof window.simpanDraftLaporan === 'function') {
+      window.simpanDraftLaporan();
+    }
+    
+    // Perbarui PDF Preview di Step 4
+    if (typeof preparePDFPreview === 'function') {
+      preparePDFPreview();
+    }
+  };
 }

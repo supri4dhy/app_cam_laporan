@@ -22,8 +22,8 @@
   <link rel="icon" type="image/png" href="icon-192.png">
   
   <!-- Custom CSS -->
-  <link rel="stylesheet" href="style.css?v=3.8">
-  <link rel="stylesheet" href="style-mobile.css?v=3.8">
+  <link rel="stylesheet" href="style.css?v=3.9">
+  <link rel="stylesheet" href="style-mobile.css?v=3.9">
   <!-- jsPDF & html2canvas -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -195,7 +195,9 @@
         </div>
 
         <div class="step-actions">
-          <div></div> <!-- Spacer -->
+          <button type="button" id="btn-reset-draft" class="btn-danger-sm hidden" title="Hapus draf laporan dan mulai baru">
+            <i class="fa-solid fa-trash-can"></i> Mulai Baru
+          </button>
           <button type="button" class="btn-primary" onclick="nextStep(1)">
             Lanjut <i class="fa-solid fa-arrow-right"></i>
           </button>
@@ -472,6 +474,26 @@
     </footer>
   </div>
 
+  <!-- Kamera Inline HTML5 Modal Overlay -->
+  <div id="camera-modal" class="camera-modal-overlay hidden">
+    <div class="camera-modal-content">
+      <div class="camera-viewfinder-wrapper">
+        <video id="camera-stream" class="camera-video-stream" autoplay playsinline></video>
+        <canvas id="camera-capture-canvas" class="hidden"></canvas>
+        <div class="camera-toast-guide"><i class="fa-solid fa-circle-info"></i> Bidik & Ketuk Tombol Shutter</div>
+      </div>
+      <div class="camera-shutter-bar">
+        <button type="button" id="btn-camera-close" class="camera-btn-action" title="Tutup Kamera">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+        <button type="button" id="btn-camera-shutter" class="camera-shutter-btn" title="Ambil Foto"></button>
+        <button type="button" id="btn-camera-switch" class="camera-btn-action" title="Ganti Kamera">
+          <i class="fa-solid fa-camera-rotate"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- Loading Overlay -->
   <div id="loading-overlay" class="loading-overlay hidden">
     <div class="spinner-container">
@@ -501,13 +523,13 @@
   </nav>
 
   <!-- Custom JS Modules -->
-  <script src="js/state.js?v=3.4"></script>
-  <script src="js/voice.js?v=3.4"></script>
-  <script src="js/step1_data.js?v=3.4"></script>
-  <script src="js/step2_tmpl.js?v=3.4"></script>
-  <script src="js/step3_photo.js?v=3.4"></script>
-  <script src="js/step4_pdf.js?v=3.4"></script>
-  <script src="app.js?v=3.4"></script>
+  <script src="js/state.js?v=3.5"></script>
+  <script src="js/voice.js?v=3.5"></script>
+  <script src="js/step1_data.js?v=3.5"></script>
+  <script src="js/step2_tmpl.js?v=3.5"></script>
+  <script src="js/step3_photo.js?v=3.5"></script>
+  <script src="js/step4_pdf.js?v=3.5"></script>
+  <script src="app.js?v=3.5"></script>
 </body>
 
 </html>

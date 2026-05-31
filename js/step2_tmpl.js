@@ -22,6 +22,11 @@ function initTemplates() {
       
       // Render ulang slot foto di Step 3
       renderPhotoSlots();
+      
+      // Simpan draf secara real-time
+      if (typeof window.simpanDraftLaporan === 'function') {
+        window.simpanDraftLaporan();
+      }
     });
   });
 }
