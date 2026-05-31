@@ -57,7 +57,7 @@ function setupVoiceInput(btnId, inputId) {
     btnMic.innerHTML = '<i class="fa-solid fa-microphone"></i> Dikte';
     
     if (event.error === 'not-allowed') {
-      alert("Izin mikrofon ditolak. Silakan izinkan akses mikrofon di pengaturan browser Anda.");
+      showToast("Izin mikrofon ditolak. Silakan izinkan akses mikrofon di pengaturan browser Anda.", "warning");
     }
   };
   

@@ -57,3 +57,45 @@ const elements = {
   btnPwaInstall: document.getElementById('btn-pwa-install'),
   btnPwaDismiss: null
 };
+
+// Sistem Notifikasi Toast Kustom Global
+window.showToast = function(message, type = 'info') {
+  let container = document.getElementById('toast-container');
+  if (!container) {
+    container = document.createElement('div');
+    container.id = 'toast-container';
+    container.className = 'toast-container';
+    document.body.appendChild(container);
+  }
+  
+  const toast = document.createElement('div');
+  toast.className = `custom-toast toast-${type}`;
+  
+  let iconClass = 'fa-circle-info';
+  if (type === 'success') iconClass = 'fa-circle-check';
+  else if (type === 'error') iconClass = 'fa-circle-exclamation';
+  else if (type === 'warning') iconClass = 'fa-triangle-exclamation';
+  
+  toast.innerHTML = `
+    <div class="custom-toast-icon"><i class="fa-solid ${iconClass}"></i></div>
+    <div class="custom-toast-message">${message}</div>
+  `;
+  
+  container.appendChild(toast);
+  
+  // Memicu animasi masuk
+  setTimeout(() => {
+    toast.classList.add('show');
+  }, 10);
+  
+  // Hapus otomatis setelah 3.5 detik
+  setTimeout(() => {
+    toast.classList.remove('show');
+    setTimeout(() => {
+      toast.remove();
+      if (container.children.length === 0) {
+        container.remove();
+      }
+    }, 300);
+  }, 3500);
+};

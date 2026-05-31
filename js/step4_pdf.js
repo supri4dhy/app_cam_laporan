@@ -223,12 +223,12 @@ function generatePDFReport() {
       pdf.save(`${cleanFileName}_${getFormattedDateShort()}.pdf`);
       
       hideLoading();
-      alert("Dokumentasi PDF berhasil dibuat dan diunduh ke perangkat Anda!");
+      showToast("Dokumentasi PDF berhasil dibuat dan diunduh ke perangkat Anda!", "success");
     }).catch(err => {
       console.error("Gagal membuat PDF:", err);
       window.scrollTo(0, originalScrollTop);
       hideLoading();
-      alert("Gagal merender dokumen PDF. Silakan coba kembali.");
+      showToast("Gagal merender dokumen PDF. Silakan coba kembali.", "error");
     });
   }, 300);
 }

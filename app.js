@@ -64,7 +64,7 @@ function validateStep(stepNumber) {
   if (stepNumber === 1) {
     const nama = elements.kegiatanNama.value.trim();
     if (!nama) {
-      alert("Silakan masukkan Nama Kegiatan terlebih dahulu.");
+      showToast("Silakan masukkan Nama Kegiatan terlebih dahulu.", "warning");
       elements.kegiatanNama.focus();
       return false;
     }

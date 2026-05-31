@@ -140,7 +140,7 @@ function renderPhotoSlots() {
 // 2. Memproses File Gambar & Kompresi ke base64
 function processImageFile(file, slotId, slotEl) {
   if (!file.type.startsWith('image/')) {
-    alert("Berkas yang dipilih harus berupa gambar.");
+    showToast("Berkas yang dipilih harus berupa gambar.", "warning");
     return;
   }
   

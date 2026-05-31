@@ -19,7 +19,7 @@ function initDateTime() {
 // 2. Deteksi GPS & Reverse Geocoding alamat jalan
 function handleGPSDetection() {
   if (!navigator.geolocation) {
-    alert("Maaf, browser Anda tidak mendukung deteksi lokasi (GPS).");
+    showToast("Maaf, browser Anda tidak mendukung deteksi lokasi (GPS).", "error");
     return;
   }
   
@@ -95,7 +95,7 @@ function handleGPSDetection() {
         default:
           errorMsg += "Terjadi kesalahan tidak dikenal.";
       }
-      alert(errorMsg);
+      showToast(errorMsg, "error");
     },
     {
       enableHighAccuracy: true,
@@ -133,7 +133,7 @@ function initLogoUpload() {
 
 function processLogoFile(file) {
   if (!file.type.startsWith('image/')) {
-    alert("Berkas yang dipilih harus berupa gambar.");
+    showToast("Berkas yang dipilih harus berupa gambar.", "warning");
     return;
   }
   
