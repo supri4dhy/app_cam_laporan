@@ -14,7 +14,8 @@
   <!-- Font Awesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <!-- Custom CSS -->
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css?v=2.0">
+  <link rel="stylesheet" href="style-mobile.css?v=2.0">
   <!-- jsPDF & html2canvas -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -80,12 +81,13 @@
                 <i class="fa-solid fa-circle-info"></i> Nama Kegiatan
               </label>
               <button type="button" id="btn-mic-nama" class="btn-mic-recording" title="Dikte Suara">
-                <i class="fa-solid fa-microphone"></i> Dikte
+                <i class="fa-solid fa-microphone"></i>
               </button>
             </div>
             <div class="input-wrapper">
               <i class="fa-solid fa-pen-clip input-icon align-top"></i>
-              <textarea id="kegiatan-nama" rows="2" placeholder="Contoh: Peninjauan Jembatan Rusak Dusun A" required></textarea>
+              <textarea id="kegiatan-nama" rows="2" placeholder="Contoh: Peninjauan Jembatan Rusak Dusun A"
+                required></textarea>
             </div>
           </div>
 
@@ -338,13 +340,19 @@
           <div class="pdf-a4-page" id="pdf-content-to-render">
             <div class="pdf-header">
               <div class="pdf-kop-area" style="display: flex; align-items: center; gap: 16px; margin-bottom: 8px;">
-                <div class="pdf-header-logo-area" style="width: 50px; height: 50px; display: flex; justify-content: center; align-items: center; background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; overflow: hidden; flex-shrink: 0;">
-                  <i class="fa-solid fa-camera-retro" id="pdf-default-logo-icon" style="font-size: 24px; color: #0d9488;"></i>
-                  <img id="pdf-logo-img" class="hidden" alt="Logo Instansi" style="max-width: 100%; max-height: 100%; object-fit: contain;">
+                <div class="pdf-header-logo-area"
+                  style="width: 50px; height: 50px; display: flex; justify-content: center; align-items: center; background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; overflow: hidden; flex-shrink: 0;">
+                  <i class="fa-solid fa-camera-retro" id="pdf-default-logo-icon"
+                    style="font-size: 24px; color: #0d9488;"></i>
+                  <img id="pdf-logo-img" class="hidden" alt="Logo Instansi"
+                    style="max-width: 100%; max-height: 100%; object-fit: contain;">
                 </div>
-                <h2 style="font-size: 18px; font-weight: 800; color: #0f766e; letter-spacing: 0.5px; margin: 0; text-align: left;">DOKUMENTASI KEGIATAN</h2>
+                <h2
+                  style="font-size: 18px; font-weight: 800; color: #0f766e; letter-spacing: 0.5px; margin: 0; text-align: left;">
+                  DOKUMENTASI KEGIATAN</h2>
               </div>
-              <div class="pdf-divider" style="height: 3px; background-color: #0d9488; margin-bottom: 12px; border-radius: 2px;"></div>
+              <div class="pdf-divider"
+                style="height: 3px; background-color: #0d9488; margin-bottom: 12px; border-radius: 2px;"></div>
               <div class="pdf-meta-table">
                 <div class="pdf-meta-row" id="pdf-row-pelapor">
                   <span class="pdf-meta-label">Pelapor / Petugas</span>
@@ -434,13 +442,13 @@
   </nav>
 
   <!-- Custom JS Modules -->
-  <script src="js/state.js"></script>
-  <script src="js/voice.js"></script>
-  <script src="js/step1_data.js"></script>
-  <script src="js/step2_tmpl.js"></script>
-  <script src="js/step3_photo.js"></script>
-  <script src="js/step4_pdf.js"></script>
-  <script src="app.js"></script>
+  <script src="js/state.js?v=1.2"></script>
+  <script src="js/voice.js?v=1.2"></script>
+  <script src="js/step1_data.js?v=1.2"></script>
+  <script src="js/step2_tmpl.js?v=1.2"></script>
+  <script src="js/step3_photo.js?v=1.2"></script>
+  <script src="js/step4_pdf.js?v=1.2"></script>
+  <script src="app.js?v=1.2"></script>
 </body>
 
 </html>
