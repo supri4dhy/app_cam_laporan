@@ -55,6 +55,13 @@
 
   .logo-text h1 {
     font-size: 20px !important;
+    color: #0f172a !important; /* Warna gelap slate-900 yang sangat jelas */
+  }
+
+  .logo-text h1 span {
+    background: var(--primary-gradient) !important;
+    -webkit-background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
   }
 
   .logo-text p {
