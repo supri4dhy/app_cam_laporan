@@ -1,5 +1,5 @@
-// Service Worker LaporCam PWA
-const CACHE_NAME = 'laporcam-v3';
+// Service Worker LaporCAM PWA
+const CACHE_NAME = 'laporcam-v5';
 const urlsToCache = [
   '/app_cam_laporan/',
   '/app_cam_laporan/index.html',

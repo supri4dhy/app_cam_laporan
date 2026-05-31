@@ -53,7 +53,7 @@ const elements = {
   btnShareWa: document.getElementById('btn-share-wa'),
   
   // PWA Install Elements
-  pwaInstallBanner: document.getElementById('pwa-install-banner'),
+  pwaInstallBanner: document.getElementById('btn-pwa-install'),
   btnPwaInstall: document.getElementById('btn-pwa-install'),
-  btnPwaDismiss: document.getElementById('btn-pwa-dismiss')
+  btnPwaDismiss: null
 };

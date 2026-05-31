@@ -1,6 +1,6 @@
 {
-  "name": "LaporCam",
-  "short_name": "LaporCam",
+  "name": "LaporCAM",
+  "short_name": "LaporCAM",
   "description": "Laporan Foto Lapangan Instan & Profesional",
   "start_url": "/app_cam_laporan/index.html",
   "scope": "/app_cam_laporan/",

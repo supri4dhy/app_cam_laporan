@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>LaporCam - Pembuat Laporan Foto Lapangan</title>
+  <title>LaporCAM - Pembuat Laporan Foto Lapangan</title>
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -22,8 +22,8 @@
   <link rel="icon" type="image/png" href="icon-192.png">
   
   <!-- Custom CSS -->
-  <link rel="stylesheet" href="style.css?v=3.0">
-  <link rel="stylesheet" href="style-mobile.css?v=3.0">
+  <link rel="stylesheet" href="style.css?v=3.2">
+  <link rel="stylesheet" href="style-mobile.css?v=3.2">
   <!-- jsPDF & html2canvas -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -54,10 +54,16 @@
           <i class="fa-solid fa-camera-retro"></i>
         </div>
         <div class="logo-text">
-          <h1>Lapor<span>Cam</span></h1>
+          <h1>Lapor<span>CAM</span></h1>
           <p>Laporan Foto Lapangan Instan & Profesional</p>
         </div>
       </div>
+      
+      <!-- Tombol Pasang Pintasan PWA (Floating/Inline di Header) -->
+      <button type="button" id="btn-pwa-install" class="btn-pwa-install-header hidden" title="Pasang Pintasan LaporCAM">
+        <i class="fa-solid fa-download"></i>
+        <span>Pasang App</span>
+      </button>
     </header>
 
     <!-- Main Card - Form & Wizard -->
@@ -93,26 +99,7 @@
           <h2>Detail Kegiatan & Laporan</h2>
         </div>
 
-        <!-- Banner Install PWA (Hanya Muncul jika belum terinstall) -->
-        <div id="pwa-install-banner" class="pwa-install-banner hidden">
-          <div class="pwa-banner-content">
-            <div class="pwa-icon-wrapper">
-              <img src="icon-192.png" alt="LaporCam Icon" class="pwa-app-icon">
-            </div>
-            <div class="pwa-text-wrapper">
-              <h3>Gunakan LaporCam Lebih Cepat</h3>
-              <p>Tambahkan ke layar utama untuk pengalaman full-screen tanpa hambatan navigasi browser.</p>
-            </div>
-          </div>
-          <div class="pwa-banner-actions">
-            <button type="button" id="btn-pwa-install" class="btn-primary-sm">
-              <i class="fa-solid fa-square-plus"></i> Pasang Pintasan
-            </button>
-            <button type="button" id="btn-pwa-dismiss" class="btn-dismiss" title="Tutup">
-              <i class="fa-solid fa-xmark"></i>
-            </button>
-          </div>
-        </div>
+
 
         <div class="form-inputs-container">
           <div class="form-group">
@@ -431,7 +418,7 @@
             </div>
 
             <div class="pdf-footer">
-              <p>Dibuat secara otomatis melalui LaporCam App pada <span id="pdf-current-timestamp"></span></p>
+              <p>Dibuat secara otomatis melalui LaporCAM App pada <span id="pdf-current-timestamp"></span></p>
               <p>Halaman 1 dari 1</p>
             </div>
           </div>
@@ -449,7 +436,7 @@
 
     <!-- Footer -->
     <footer class="app-footer-text">
-      <p>&copy; 2026 LaporCam App. Semua data disimpan secara lokal di perangkat Anda.</p>
+      <p>&copy; 2026 LaporCAM App. Semua data disimpan secara lokal di perangkat Anda.</p>
     </footer>
   </div>
 
@@ -482,13 +469,13 @@
   </nav>
 
   <!-- Custom JS Modules -->
-  <script src="js/state.js?v=2.8"></script>
-  <script src="js/voice.js?v=2.8"></script>
-  <script src="js/step1_data.js?v=2.8"></script>
-  <script src="js/step2_tmpl.js?v=2.8"></script>
-  <script src="js/step3_photo.js?v=2.8"></script>
-  <script src="js/step4_pdf.js?v=2.8"></script>
-  <script src="app.js?v=2.8"></script>
+  <script src="js/state.js?v=3.0"></script>
+  <script src="js/voice.js?v=3.0"></script>
+  <script src="js/step1_data.js?v=3.0"></script>
+  <script src="js/step2_tmpl.js?v=3.0"></script>
+  <script src="js/step3_photo.js?v=3.0"></script>
+  <script src="js/step4_pdf.js?v=3.0"></script>
+  <script src="app.js?v=3.0"></script>
 </body>
 
 </html>

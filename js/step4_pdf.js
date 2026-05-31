@@ -153,7 +153,7 @@ function createPDFPhotoBox(index, captionText, isPortrait) {
     gpsText = `${appState.coordinates.lat.toFixed(5)}, ${appState.coordinates.lng.toFixed(5)}`;
   }
   
-  let logoHtml = `<span class="w-logo"><i class="fa-solid fa-camera-retro"></i> LaporCam</span>`;
+  let logoHtml = `<span class="w-logo"><i class="fa-solid fa-camera-retro"></i> LaporCAM</span>`;
   if (appState.logoDataURL) {
     logoHtml = `<span class="w-logo" style="display: flex; align-items: center; gap: 4px;"><img src="${appState.logoDataURL}" alt="Logo" style="height: 12px; max-width: 60px; object-fit: contain; vertical-align: middle;"></span>`;
   }

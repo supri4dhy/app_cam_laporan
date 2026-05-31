@@ -96,10 +96,11 @@ body {
 /* Header Styles */
 .app-header {
   display: flex;
-  justify-content: center;
+  justify-content: space-between;
   align-items: center;
-  padding: 4px 0;
+  padding: 6px 4px;
   flex-shrink: 0;
+  width: 100%;
 }
 
 .logo-area {
@@ -130,7 +131,7 @@ body {
   font-size: 24px;
   font-weight: 700;
   letter-spacing: -0.5px;
-  color: #0f172a;
+  color: #d97706; /* Warna Amber Emas konsisten dengan Ikon PWA */
   line-height: 1.1;
 }
 
@@ -144,6 +145,50 @@ body {
   font-size: 11px;
   color: var(--text-muted);
   font-weight: 400;
+}
+
+/* Tombol Pintasan PWA di Header */
+.btn-pwa-install-header {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--primary-gradient);
+  color: white;
+  border: none;
+  border-radius: 20px;
+  padding: 6px 14px;
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: var(--shadow-glow);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  animation: pulse-glow-btn 2s infinite;
+}
+
+.btn-pwa-install-header:hover {
+  transform: translateY(-1px) scale(1.02);
+  box-shadow: 0 6px 16px rgba(20, 184, 166, 0.4);
+}
+
+.btn-pwa-install-header i {
+  font-size: 13px;
+}
+
+.btn-pwa-install-header.hidden {
+  display: none !important;
+}
+
+@keyframes pulse-glow-btn {
+  0% {
+    box-shadow: 0 0 0 0 rgba(20, 184, 166, 0.5);
+  }
+  70% {
+    box-shadow: 0 0 0 8px rgba(20, 184, 166, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(20, 184, 166, 0);
+  }
 }
 
 @keyframes float {

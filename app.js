@@ -1,4 +1,4 @@
-// Orchestrator Utama LaporCam App
+// Orchestrator Utama LaporCAM App
 
 // 1. Inisialisasi Aplikasi saat dokumen siap
 document.addEventListener('DOMContentLoaded', () => {
@@ -210,7 +210,7 @@ if (elements.btnPwaDismiss) {
 
 // Sembunyikan banner secara otomatis setelah berhasil terinstall
 window.addEventListener('appinstalled', (evt) => {
-  console.log('LaporCam berhasil terinstal!');
+  console.log('LaporCAM berhasil terinstal!');
   if (elements.pwaInstallBanner) {
     elements.pwaInstallBanner.classList.add('hidden');
   }
