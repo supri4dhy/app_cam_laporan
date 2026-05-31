@@ -85,6 +85,10 @@ function renderPDFPhotosLayout() {
     photoCount = 2;
     defaultLabels = ['Foto Dokumentasi 1', 'Foto Dokumentasi 2'];
     isPortraitList = [false, false];
+  } else if (t === '2-portrait') {
+    photoCount = 2;
+    defaultLabels = ['Foto Dokumentasi 1 (Portrait)', 'Foto Dokumentasi 2 (Portrait)'];
+    isPortraitList = [true, true];
   } else if (t === '3-landscape') {
     photoCount = 3;
     defaultLabels = ['Foto Dokumentasi 1', 'Foto Dokumentasi 2', 'Foto Dokumentasi 3'];
@@ -97,6 +101,10 @@ function renderPDFPhotosLayout() {
     photoCount = 4;
     defaultLabels = ['Foto Dokumentasi 1', 'Foto Dokumentasi 2', 'Foto Dokumentasi 3', 'Foto Dokumentasi 4'];
     isPortraitList = [true, true, true, true];
+  } else if (t === '4-landscape') {
+    photoCount = 4;
+    defaultLabels = ['Foto Dokumentasi 1', 'Foto Dokumentasi 2', 'Foto Dokumentasi 3', 'Foto Dokumentasi 4'];
+    isPortraitList = [false, false, false, false];
   }
   
   if (t === '3-mix') {

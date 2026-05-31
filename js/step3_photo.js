@@ -17,6 +17,12 @@ function renderPhotoSlots() {
         { id: 1, label: 'Foto 2 (Landscape)', isPortrait: false, defaultCaption: 'Foto Dokumentasi 2' }
       ];
       break;
+    case '2-portrait':
+      slots = [
+        { id: 0, label: 'Foto 1 (Portrait)', isPortrait: true, defaultCaption: 'Foto Dokumentasi 1 (Portrait)' },
+        { id: 1, label: 'Foto 2 (Portrait)', isPortrait: true, defaultCaption: 'Foto Dokumentasi 2 (Portrait)' }
+      ];
+      break;
     case '3-landscape':
       slots = [
         { id: 0, label: 'Foto 1 (Landscape)', isPortrait: false, defaultCaption: 'Foto Dokumentasi 1' },
@@ -39,6 +45,14 @@ function renderPhotoSlots() {
         { id: 3, label: 'Foto 4 (Portrait)', isPortrait: true, defaultCaption: 'Foto Dokumentasi 4' }
       ];
       break;
+    case '4-landscape':
+      slots = [
+        { id: 0, label: 'Foto 1 (Landscape)', isPortrait: false, defaultCaption: 'Foto Dokumentasi 1' },
+        { id: 1, label: 'Foto 2 (Landscape)', isPortrait: false, defaultCaption: 'Foto Dokumentasi 2' },
+        { id: 2, label: 'Foto 3 (Landscape)', isPortrait: false, defaultCaption: 'Foto Dokumentasi 3' },
+        { id: 3, label: 'Foto 4 (Landscape)', isPortrait: false, defaultCaption: 'Foto Dokumentasi 4' }
+      ];
+      break;
   }
   
   slots.forEach(slot => {
@@ -58,7 +72,10 @@ function renderPhotoSlots() {
         <span>${slot.label}</span>
         <p>Klik untuk mengambil foto atau memilih berkas</p>
       </div>
-      <input type="file" accept="image/*" class="hidden file-input">
+      <!-- Input untuk Galeri / Desktop -->
+      <input type="file" accept="image/*" class="hidden file-input-gallery">
+      <!-- Input untuk Kamera Langsung (Mobile capture) -->
+      <input type="file" accept="image/*" capture="environment" class="hidden file-input-camera">
     `;
     
     // Event listener untuk memicu input file saat slot diklik
@@ -66,18 +83,37 @@ function renderPhotoSlots() {
       if (appState.photos[slot.id]) return;
       if (e.target.closest('.photo-overlay-btn')) return;
       
-      const fileInput = slotEl.querySelector('.file-input');
-      fileInput.click();
+      const fileInputGallery = slotEl.querySelector('.file-input-gallery');
+      const fileInputCamera = slotEl.querySelector('.file-input-camera');
+      
+      // Deteksi perangkat seluler (mobile)
+      const isMobileDevice = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+      
+      if (isMobileDevice) {
+        // Panggil Bottom Sheet media picker kustom
+        showMediaPicker((source) => {
+          if (source === 'camera') {
+            fileInputCamera.click();
+          } else {
+            fileInputGallery.click();
+          }
+        });
+      } else {
+        // Desktop langsung panggil galeri file chooser
+        fileInputGallery.click();
+      }
     });
     
     // Event listener untuk menangani file gambar yang masuk
-    const fileInput = slotEl.querySelector('.file-input');
-    fileInput.addEventListener('change', (e) => {
+    const handleFileChange = (e) => {
       const file = e.target.files[0];
       if (file) {
         processImageFile(file, slot.id, slotEl);
       }
-    });
+    };
+    
+    slotEl.querySelector('.file-input-gallery').addEventListener('change', handleFileChange);
+    slotEl.querySelector('.file-input-camera').addEventListener('change', handleFileChange);
     
     // Group kontrol zoom & keterangan
     const controlsGroup = document.createElement('div');
@@ -109,12 +145,18 @@ function renderPhotoSlots() {
     zoomRangeInput.addEventListener('input', (e) => {
       const val = parseFloat(e.target.value);
       transform.scale = val;
-      appState.photoTransforms[slot.id] = transform;
       
       const img = slotEl.querySelector('.photo-preview-img');
       if (img) {
+        // Terapkan pembatasan batas geser aman
+        const bounds = calculateBounds(img, slotEl, val);
+        transform.x = Math.max(-bounds.maxX, Math.min(bounds.maxX, transform.x));
+        transform.y = Math.max(-bounds.maxY, Math.min(bounds.maxY, transform.y));
+        
         img.style.transform = `translate(${transform.x}px, ${transform.y}px) scale(${val})`;
       }
+      
+      appState.photoTransforms[slot.id] = transform;
       preparePDFPreview();
     });
     
@@ -241,52 +283,107 @@ function attachDragHandlers(slotEl, slotId) {
   
   const transform = appState.photoTransforms[slotId] || { x: 0, y: 0, scale: 1.0 };
   
+  // Terapkan batas geser awal saat render
+  const bounds = calculateBounds(img, slotEl, transform.scale);
+  transform.x = Math.max(-bounds.maxX, Math.min(bounds.maxX, transform.x));
+  transform.y = Math.max(-bounds.maxY, Math.min(bounds.maxY, transform.y));
+  appState.photoTransforms[slotId] = transform;
+  
   img.style.transform = `translate(${transform.x}px, ${transform.y}px) scale(${transform.scale})`;
   img.style.transformOrigin = 'center';
   img.style.cursor = 'grab';
   
   let isDragging = false;
+  let isPinching = false;
+  
   let startX = 0;
   let startY = 0;
   let translateX = transform.x;
   let translateY = transform.y;
   
+  let startDistance = 0;
+  let startScale = transform.scale;
+  
   function startDrag(e) {
     if (e.target.closest('.photo-overlay-btn')) return;
-    isDragging = true;
     
-    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-    
-    startX = clientX - translateX;
-    startY = clientY - translateY;
-    
-    img.style.cursor = 'grabbing';
+    if (e.touches && e.touches.length === 2) {
+      // Aktifkan mode pinch-to-zoom dengan 2 jari
+      isDragging = false;
+      isPinching = true;
+      startDistance = getDistance(e.touches[0], e.touches[1]);
+      startScale = transform.scale;
+    } else if (!e.touches || e.touches.length === 1) {
+      // Aktifkan mode geser gambar biasa
+      isDragging = true;
+      isPinching = false;
+      
+      const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+      const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+      
+      startX = clientX - translateX;
+      startY = clientY - translateY;
+      
+      img.style.cursor = 'grabbing';
+    }
   }
   
   function drag(e) {
-    if (!isDragging) return;
-    e.preventDefault();
-    
-    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-    
-    translateX = clientX - startX;
-    translateY = clientY - startY;
-    
-    img.style.transform = `translate(${translateX}px, ${translateY}px) scale(${transform.scale})`;
+    if (isPinching && e.touches && e.touches.length === 2) {
+      e.preventDefault();
+      const currentDistance = getDistance(e.touches[0], e.touches[1]);
+      if (startDistance === 0) return;
+      
+      // Kalkulasi skala zoom baru
+      let newScale = startScale * (currentDistance / startDistance);
+      newScale = Math.max(1.0, Math.min(3.0, newScale)); // Batas zoom 1.0x sampai 3.0x
+      
+      transform.scale = newScale;
+      
+      // Amankan pergeseran agar tidak bocor dari batas slot foto
+      const bounds = calculateBounds(img, slotEl, newScale);
+      translateX = Math.max(-bounds.maxX, Math.min(bounds.maxX, translateX));
+      translateY = Math.max(-bounds.maxY, Math.min(bounds.maxY, translateY));
+      
+      transform.x = translateX;
+      transform.y = translateY;
+      appState.photoTransforms[slotId] = transform;
+      
+      img.style.transform = `translate(${translateX}px, ${translateY}px) scale(${newScale})`;
+      
+      // Sinkronkan ke slider input zoom jika terlihat (di desktop)
+      const slider = slotEl.parentElement.querySelector('.zoom-range-input');
+      if (slider) slider.value = newScale;
+      
+    } else if (isDragging) {
+      e.preventDefault();
+      const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+      const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+      
+      let rawX = clientX - startX;
+      let rawY = clientY - startY;
+      
+      // Amankan pergeseran gambar dari batas tepi slot foto
+      const bounds = calculateBounds(img, slotEl, transform.scale);
+      translateX = Math.max(-bounds.maxX, Math.min(bounds.maxX, rawX));
+      translateY = Math.max(-bounds.maxY, Math.min(bounds.maxY, rawY));
+      
+      img.style.transform = `translate(${translateX}px, ${translateY}px) scale(${transform.scale})`;
+    }
   }
   
   function endDrag() {
-    if (!isDragging) return;
-    isDragging = false;
-    img.style.cursor = 'grab';
-    
-    transform.x = translateX;
-    transform.y = translateY;
-    appState.photoTransforms[slotId] = transform;
-    
-    preparePDFPreview();
+    if (isDragging || isPinching) {
+      isDragging = false;
+      isPinching = false;
+      img.style.cursor = 'grab';
+      
+      transform.x = translateX;
+      transform.y = translateY;
+      appState.photoTransforms[slotId] = transform;
+      
+      preparePDFPreview();
+    }
   }
   
   img.addEventListener('mousedown', startDrag);
@@ -298,6 +395,69 @@ function attachDragHandlers(slotEl, slotId) {
   img.addEventListener('mouseup', endDrag);
   img.addEventListener('mouseleave', endDrag);
   img.addEventListener('touchend', endDrag);
+  
+  // Zooming dengan Mouse Wheel (Desktop bonus)
+  img.addEventListener('wheel', (e) => {
+    e.preventDefault();
+    let delta = -e.deltaY * 0.001;
+    let newScale = transform.scale + delta;
+    newScale = Math.max(1.0, Math.min(3.0, newScale));
+    
+    transform.scale = newScale;
+    
+    const bounds = calculateBounds(img, slotEl, newScale);
+    translateX = Math.max(-bounds.maxX, Math.min(bounds.maxX, translateX));
+    translateY = Math.max(-bounds.maxY, Math.min(bounds.maxY, translateY));
+    
+    transform.x = translateX;
+    transform.y = translateY;
+    appState.photoTransforms[slotId] = transform;
+    
+    img.style.transform = `translate(${translateX}px, ${translateY}px) scale(${newScale})`;
+    
+    const slider = slotEl.parentElement.querySelector('.zoom-range-input');
+    if (slider) slider.value = newScale;
+    
+    preparePDFPreview();
+  }, { passive: false });
+}
+
+// Helper: Hitung jarak antar 2 jari sentuh (Pinch)
+function getDistance(touch1, touch2) {
+  const dx = touch1.clientX - touch2.clientX;
+  const dy = touch1.clientY - touch2.clientY;
+  return Math.sqrt(dx * dx + dy * dy);
+}
+
+// Helper: Hitung batas geser maksimum (maxX, maxY) agar gambar tidak meninggalkan celah di boks
+function calculateBounds(imgEl, slotEl, scale) {
+  const W_box = slotEl.clientWidth;
+  const H_box = slotEl.clientHeight;
+  
+  // Ambil resolusi asli gambar
+  const W_img = imgEl.naturalWidth || W_box;
+  const H_img = imgEl.naturalHeight || H_box;
+  
+  const r_box = W_box / H_box;
+  const r_img = W_img / H_img;
+  
+  let W_render = W_box;
+  let H_render = H_box;
+  
+  // Hitung dimensi render aktual karena menggunakan object-fit: cover
+  if (r_img > r_box) {
+    H_render = H_box;
+    W_render = H_box * r_img;
+  } else {
+    W_render = W_box;
+    H_render = W_box / r_img;
+  }
+  
+  // Hitung batas geser X & Y maksimal dari titik tengah
+  const maxX = Math.max(0, ((W_render * scale) - W_box) / 2);
+  const maxY = Math.max(0, ((H_render * scale) - H_box) / 2);
+  
+  return { maxX, maxY };
 }
 
 // 5. Hapus Foto dari Slot
@@ -314,8 +474,75 @@ function deletePhoto(slotId, slotEl) {
   const overlay = slotEl.querySelector('.photo-overlay');
   if (overlay) overlay.remove();
   
-  const fileInput = slotEl.querySelector('.file-input');
-  fileInput.value = '';
+  const fileInputGallery = slotEl.querySelector('.file-input-gallery');
+  if (fileInputGallery) fileInputGallery.value = '';
+  const fileInputCamera = slotEl.querySelector('.file-input-camera');
+  if (fileInputCamera) fileInputCamera.value = '';
   
   preparePDFPreview();
+}
+
+// 6. Implementasi Bottom Sheet Picker untuk HP (Camera vs Gallery)
+function showMediaPicker(onSourceSelected) {
+  // Hapus Picker lama jika tersisa
+  const oldBackdrop = document.querySelector('.media-picker-backdrop');
+  if (oldBackdrop) oldBackdrop.remove();
+  const oldSheet = document.querySelector('.media-picker-sheet');
+  if (oldSheet) oldSheet.remove();
+
+  // Buat backdrop
+  const backdrop = document.createElement('div');
+  backdrop.className = 'media-picker-backdrop';
+  
+  // Buat sheet menu
+  const sheet = document.createElement('div');
+  sheet.className = 'media-picker-sheet';
+  sheet.innerHTML = `
+    <div class="media-picker-header">
+      <div class="media-picker-indicator"></div>
+      <h4>Pilih Sumber Foto</h4>
+    </div>
+    <div class="media-picker-options">
+      <button type="button" class="picker-opt btn-camera">
+        <div class="opt-icon"><i class="fa-solid fa-camera"></i></div>
+        <span>Ambil Foto (Kamera)</span>
+      </button>
+      <button type="button" class="picker-opt btn-gallery">
+        <div class="opt-icon"><i class="fa-solid fa-images"></i></div>
+        <span>Pilih dari Galeri</span>
+      </button>
+    </div>
+    <button type="button" class="media-picker-cancel">Batal</button>
+  `;
+  
+  document.body.appendChild(backdrop);
+  document.body.appendChild(sheet);
+  
+  // Trigger animasi masuk
+  setTimeout(() => {
+    backdrop.classList.add('show');
+    sheet.classList.add('show');
+  }, 10);
+  
+  const close = () => {
+    backdrop.classList.remove('show');
+    sheet.classList.remove('show');
+    setTimeout(() => {
+      backdrop.remove();
+      sheet.remove();
+    }, 300);
+  };
+  
+  backdrop.addEventListener('click', close);
+  sheet.querySelector('.media-picker-cancel').addEventListener('click', close);
+  
+  sheet.querySelector('.btn-camera').addEventListener('click', () => {
+    close();
+    onSourceSelected('camera');
+  });
+  
+  sheet.querySelector('.btn-gallery').addEventListener('click', () => {
+    close();
+    onSourceSelected('gallery');
+  });
 }

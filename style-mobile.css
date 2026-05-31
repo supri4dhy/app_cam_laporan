@@ -255,10 +255,14 @@
      STEP 2 — Template (2 kolom)
      ========================================================= */
   .template-grid {
-    grid-template-columns: 1fr 1fr !important;
+    grid-template-columns: repeat(2, 1fr) !important; /* 2 kolom di mobile */
     gap: 10px !important;
     align-items: stretch !important;
-    overflow: visible !important;
+    overflow-y: auto !important;
+    flex: 1 !important;
+    min-height: 0 !important;
+    padding-right: 2px !important;
+    overscroll-behavior-y: contain !important;
   }
 
   .template-card {
@@ -320,6 +324,14 @@
     grid-template-columns: 1fr 1fr !important;
   }
 
+  .upload-grid-2-portrait {
+    grid-template-columns: 1fr 1fr !important;
+  }
+
+  .upload-grid-4-landscape {
+    grid-template-columns: 1fr !important;
+  }
+
   .photo-slot-wrapper {
     padding: 6px !important;
     border-radius: 10px !important;
@@ -327,7 +339,7 @@
   }
 
   .photo-slot {
-    height: 90px !important;
+    height: auto !important;
     border-radius: 8px !important;
   }
 
@@ -344,8 +356,7 @@
   }
 
   .zoom-control-row {
-    padding: 2px 6px !important;
-    border-radius: 6px !important;
+    display: none !important;
   }
 
   .zoom-icon {
@@ -464,4 +475,119 @@
   .watermark-row-gps {
     font-size: 7px;
   }
+}
+
+/* Bottom Sheet Media Picker */
+.media-picker-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(15, 23, 42, 0.4);
+  backdrop-filter: blur(4px);
+  z-index: 10000;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+.media-picker-backdrop.show {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.media-picker-sheet {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: #ffffff;
+  border-top-left-radius: 20px;
+  border-top-right-radius: 20px;
+  padding: 16px 20px calc(20px + env(safe-area-inset-bottom));
+  box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.15);
+  z-index: 10001;
+  transform: translateY(100%);
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.media-picker-sheet.show {
+  transform: translateY(0);
+}
+
+.media-picker-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+.media-picker-indicator {
+  width: 36px;
+  height: 4px;
+  background-color: #cbd5e1;
+  border-radius: 2px;
+}
+.media-picker-header h4 {
+  font-family: var(--font-title);
+  font-size: 15px;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0;
+}
+
+.media-picker-options {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+.picker-opt {
+  border: 1px solid var(--border-color);
+  background-color: var(--bg-tertiary);
+  border-radius: 12px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.picker-opt:active {
+  background-color: #f0fdfa;
+  border-color: #ccfbf1;
+}
+.opt-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--primary-gradient);
+  color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 18px;
+}
+.picker-opt span {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-main);
+  text-align: center;
+}
+
+.media-picker-cancel {
+  border: none;
+  background-color: #f1f5f9;
+  color: #64748b;
+  border-radius: 10px;
+  padding: 10px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  text-align: center;
+  width: 100%;
+}
+.media-picker-cancel:active {
+  background-color: #e2e8f0;
 }

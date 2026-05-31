@@ -585,11 +585,14 @@ textarea:focus {
 /* Template Cards Grid */
 .template-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  grid-template-columns: repeat(3, 1fr); /* 3 kolom di desktop */
   gap: 16px;
   margin-bottom: 8px;
   align-items: start; /* Menghentikan peregangan vertikal */
   overflow-y: auto;
+  flex: 1;
+  min-height: 0;
+  padding-right: 4px;
 }
 
 .template-card {
@@ -678,30 +681,108 @@ textarea:focus {
   width: 100%;
   height: 100%;
   box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 9px;
+  font-weight: 700;
+  color: #475569;
 }
 
+/* Layout 2 Landscape Preview */
 .layout-2-landscape {
-  grid-template-rows: 1fr 1fr;
-}
-
-.layout-3-landscape {
-  grid-template-rows: 1fr 1fr 1fr;
-}
-
-.layout-3-mix {
-  grid-template-rows: 1.1fr 0.9fr;
-  grid-template-columns: 1fr;
-}
-
-.t-sub-grid-top {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
   gap: 4px;
 }
+.layout-2-landscape .t-box {
+  width: 85%;
+  height: auto;
+  aspect-ratio: 16 / 9;
+}
 
+/* Layout 3 Landscape Preview */
+.layout-3-landscape {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 3px;
+}
+.layout-3-landscape .t-box {
+  width: 70%;
+  height: auto;
+  aspect-ratio: 16 / 9;
+}
+
+/* Layout 3 Mix Preview */
+.layout-3-mix {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 4px;
+}
+.layout-3-mix .t-sub-grid-top {
+  display: flex;
+  justify-content: center;
+  gap: 4px;
+  width: 100%;
+}
+.layout-3-mix .t-sub-grid-top .t-box {
+  width: 32%;
+  height: auto;
+  aspect-ratio: 9 / 16;
+}
+.layout-3-mix > .t-box {
+  width: 66%;
+  height: auto;
+  aspect-ratio: 16 / 9;
+}
+
+/* Layout 4 Portrait Preview */
 .layout-4-portrait {
+  display: grid;
   grid-template-columns: 1fr 1fr;
   grid-template-rows: 1fr 1fr;
+  gap: 4px;
+  justify-items: center;
+  align-content: center;
+}
+.layout-4-portrait .t-box {
+  width: 75%;
+  height: auto;
+  aspect-ratio: 9 / 16;
+}
+
+/* Layout 2 Portrait Preview */
+.layout-2-portrait {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+}
+.layout-2-portrait .t-box {
+  width: 40%;
+  height: auto;
+  aspect-ratio: 9 / 16;
+}
+
+/* Layout 4 Landscape Preview */
+.layout-4-landscape {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  gap: 4px;
+  justify-items: center;
+  align-content: center;
+}
+.layout-4-landscape .t-box {
+  width: 85%;
+  height: auto;
+  aspect-ratio: 16 / 9;
 }
 
 /* Photo Upload Layout (Step 3) */
@@ -719,6 +800,11 @@ textarea:focus {
   grid-template-rows: auto auto;
 }
 
+.upload-grid-2-portrait {
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: auto;
+}
+
 .upload-grid-3-landscape {
   grid-template-columns: 1fr;
   grid-template-rows: auto auto auto;
@@ -733,6 +819,11 @@ textarea:focus {
 }
 
 .upload-grid-4-portrait {
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: auto auto;
+}
+
+.upload-grid-4-landscape {
   grid-template-columns: 1fr 1fr;
   grid-template-rows: auto auto;
 }
@@ -1246,6 +1337,31 @@ textarea:focus {
 .pdf-grid-4-portrait .pdf-photo-box {
   width: 220px; /* Portrait boxes */
   aspect-ratio: 9 / 16; /* Lock ratio to exactly 9:16 portrait */
+}
+
+.pdf-grid-2-portrait {
+  display: flex;
+  justify-content: center;
+  gap: 24px;
+  width: 100%;
+}
+.pdf-grid-2-portrait .pdf-photo-box {
+  width: 280px; /* Portrait boxes side by side */
+  aspect-ratio: 9 / 16; /* Lock ratio to exactly 9:16 portrait */
+}
+
+.pdf-grid-4-landscape {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: auto auto;
+  gap: 16px;
+  justify-items: center;
+  align-content: center;
+  width: 100%;
+}
+.pdf-grid-4-landscape .pdf-photo-box {
+  width: 300px;
+  aspect-ratio: 16 / 9; /* Lock ratio to exactly 16:9 landscape */
 }
 
 /* PDF Image Box */
