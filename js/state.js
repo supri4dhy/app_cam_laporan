@@ -12,6 +12,46 @@ const appState = {
   logoDataURL: null // Menyimpan base64 logo instansi kustom
 };
 
+// =========================================================
+//  PERSISTENSI DATA: Simpan & Muat dari localStorage
+//  Data yang disimpan permanen: Logo Instansi & Nama Pelapor
+// =========================================================
+const STORAGE_KEYS = {
+  LOGO: 'laporcam_logo',
+  PELAPOR: 'laporcam_pelapor'
+};
+
+window.simpanLogo = function(dataURL) {
+  try {
+    if (dataURL) {
+      localStorage.setItem(STORAGE_KEYS.LOGO, dataURL);
+    } else {
+      localStorage.removeItem(STORAGE_KEYS.LOGO);
+    }
+  } catch (e) {
+    // localStorage mungkin penuh (logo base64 besar), abaikan error
+    console.warn('Gagal menyimpan logo ke localStorage:', e);
+  }
+};
+
+window.muatLogoTersimpan = function() {
+  return localStorage.getItem(STORAGE_KEYS.LOGO) || null;
+};
+
+window.simpanPelapor = function(nama) {
+  if (nama && nama.trim()) {
+    localStorage.setItem(STORAGE_KEYS.PELAPOR, nama.trim());
+  }
+};
+
+window.muatPelaporTersimpan = function() {
+  return localStorage.getItem(STORAGE_KEYS.PELAPOR) || '';
+};
+
+window.hapusLogoTersimpan = function() {
+  localStorage.removeItem(STORAGE_KEYS.LOGO);
+};
+
 // DOM Elements Global Namespace
 const elements = {
   kegiatanNama: document.getElementById('kegiatan-nama'),

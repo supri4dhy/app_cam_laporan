@@ -129,6 +129,38 @@ function initLogoUpload() {
       removeLogo();
     });
   }
+
+  // === MUAT DATA TERSIMPAN dari localStorage ===
+  // Muat logo yang sudah tersimpan sebelumnya
+  const savedLogo = muatLogoTersimpan();
+  if (savedLogo) {
+    appState.logoDataURL = savedLogo;
+    const previewImg = document.getElementById('logo-preview-img');
+    if (previewImg) {
+      previewImg.src = savedLogo;
+      previewImg.classList.remove('hidden');
+    }
+    const placeholderIcon = document.getElementById('logo-placeholder-icon');
+    if (placeholderIcon) placeholderIcon.classList.add('hidden');
+    if (btnRemove) btnRemove.classList.remove('hidden');
+    showToast('Logo instansi berhasil dimuat dari memori.', 'info');
+  }
+
+  // Muat nama pelapor yang sudah tersimpan sebelumnya
+  const savedPelapor = muatPelaporTersimpan();
+  if (savedPelapor && elements.kegiatanPelapor) {
+    elements.kegiatanPelapor.value = savedPelapor;
+  }
+
+  // Simpan otomatis nama pelapor setiap kali diubah
+  if (elements.kegiatanPelapor) {
+    elements.kegiatanPelapor.addEventListener('change', () => {
+      simpanPelapor(elements.kegiatanPelapor.value);
+    });
+    elements.kegiatanPelapor.addEventListener('blur', () => {
+      simpanPelapor(elements.kegiatanPelapor.value);
+    });
+  }
 }
 
 function processLogoFile(file) {
@@ -171,6 +203,9 @@ function processLogoFile(file) {
       
       appState.logoDataURL = compressedLogo;
       
+      // Simpan logo ke localStorage agar tidak perlu upload ulang
+      simpanLogo(compressedLogo);
+      
       // Update UI Form Preview
       const previewImg = document.getElementById('logo-preview-img');
       if (previewImg) {
@@ -188,6 +223,8 @@ function processLogoFile(file) {
         btnRemove.classList.remove('hidden');
       }
       
+      showToast('Logo instansi tersimpan dan akan dimuat otomatis di sesi berikutnya.', 'success');
+      
       // Perbarui pratinjau PDF di Step 4
       if (typeof preparePDFPreview === 'function') {
         preparePDFPreview();
@@ -199,6 +236,9 @@ function processLogoFile(file) {
 
 function removeLogo() {
   appState.logoDataURL = null;
+  
+  // Hapus juga dari localStorage
+  hapusLogoTersimpan();
   
   const previewImg = document.getElementById('logo-preview-img');
   if (previewImg) {
@@ -220,6 +260,8 @@ function removeLogo() {
   if (fileInput) {
     fileInput.value = '';
   }
+  
+  showToast('Logo instansi telah dihapus dari memori.', 'info');
   
   // Perbarui pratinjau PDF di Step 4
   if (typeof preparePDFPreview === 'function') {
