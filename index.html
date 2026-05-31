@@ -74,9 +74,14 @@
         </div>
 
         <div class="form-group">
-          <label for="kegiatan-nama">
-            <i class="fa-solid fa-circle-info"></i> Nama Kegiatan
-          </label>
+          <div class="label-with-action">
+            <label for="kegiatan-nama">
+              <i class="fa-solid fa-circle-info"></i> Nama Kegiatan
+            </label>
+            <button type="button" id="btn-mic-nama" class="btn-mic-recording" title="Dikte Suara">
+              <i class="fa-solid fa-microphone"></i> Dikte
+            </button>
+          </div>
           <div class="input-wrapper">
             <i class="fa-solid fa-pen-clip input-icon"></i>
             <input type="text" id="kegiatan-nama" placeholder="Contoh: Peninjauan Jembatan Rusak Dusun A" required>
@@ -128,17 +133,12 @@
         </div>
 
         <div class="form-group">
-          <div class="label-with-action">
-            <label for="kegiatan-catatan">
-              <i class="fa-solid fa-note-sticky"></i> Catatan Kegiatan
-            </label>
-            <button type="button" id="btn-mic-catatan" class="btn-mic-recording" title="Dikte Suara">
-              <i class="fa-solid fa-microphone"></i> Dikte
-            </button>
-          </div>
+          <label for="kegiatan-pelapor">
+            <i class="fa-solid fa-user"></i> Pelapor / Petugas
+          </label>
           <div class="input-wrapper">
-            <i class="fa-solid fa-comment-dots input-icon align-top"></i>
-            <textarea id="kegiatan-catatan" rows="3" placeholder="Masukkan catatan kegiatan tambahan... (Atau klik 'Dikte' untuk mengisi dengan suara)"></textarea>
+            <i class="fa-solid fa-user-pen input-icon"></i>
+            <input type="text" id="kegiatan-pelapor" placeholder="Contoh: Budi Santoso (Staf Lapangan)">
           </div>
         </div>
 
@@ -315,10 +315,15 @@
           <div class="pdf-a4-page" id="pdf-content-to-render">
             <div class="pdf-header">
               <div class="pdf-title-block">
-                <h2>LAPORAN KEGIATAN LAPANGAN</h2>
+                <h2>DOKUMENTASI KEGIATAN</h2>
                 <div class="pdf-divider"></div>
               </div>
               <div class="pdf-meta-table">
+                <div class="pdf-meta-row" id="pdf-row-pelapor">
+                  <span class="pdf-meta-label">Pelapor / Petugas</span>
+                  <span class="pdf-meta-separator">:</span>
+                  <span class="pdf-meta-value" id="pdf-val-pelapor">Belum diisi</span>
+                </div>
                 <div class="pdf-meta-row">
                   <span class="pdf-meta-label">Nama Kegiatan</span>
                   <span class="pdf-meta-separator">:</span>
@@ -338,11 +343,6 @@
                   <span class="pdf-meta-label">Koordinat GPS</span>
                   <span class="pdf-meta-separator">:</span>
                   <span class="pdf-meta-value" id="pdf-val-koordinat">-</span>
-                </div>
-                <div class="pdf-meta-row" id="pdf-row-catatan">
-                  <span class="pdf-meta-label">Catatan</span>
-                  <span class="pdf-meta-separator">:</span>
-                  <span class="pdf-meta-value" id="pdf-val-catatan">Belum diisi</span>
                 </div>
               </div>
             </div>
@@ -406,7 +406,13 @@
     </div>
   </nav>
 
-  <!-- Custom JS -->
+  <!-- Custom JS Modules -->
+  <script src="js/state.js"></script>
+  <script src="js/voice.js"></script>
+  <script src="js/step1_data.js"></script>
+  <script src="js/step2_tmpl.js"></script>
+  <script src="js/step3_photo.js"></script>
+  <script src="js/step4_pdf.js"></script>
   <script src="app.js"></script>
 </body>
 
