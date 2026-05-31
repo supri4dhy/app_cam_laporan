@@ -663,7 +663,7 @@ textarea:focus {
   background-color: var(--bg-tertiary);
   border: 2px dashed #cbd5e1;
   border-radius: 10px;
-  aspect-ratio: 4/3;
+  aspect-ratio: 16 / 9; /* Lock to photographic aspect ratio 16:9 */
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -676,7 +676,7 @@ textarea:focus {
 }
 
 .photo-slot.portrait-slot {
-  aspect-ratio: 3/4;
+  aspect-ratio: 9 / 16; /* Lock to photographic aspect ratio 9:16 */
 }
 
 .photo-slot:hover {
@@ -1078,14 +1078,18 @@ textarea:focus {
 
 /* Dinamis Grid Laporan PDF */
 .pdf-photos-grid {
-  display: grid;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
   gap: 12px;
   height: 100%;
   flex-grow: 1;
   min-height: 0;
+  width: 100%;
 }
 
-/* PDF Height Adjustments */
+/* PDF Height Adjustments act as max-height container limits */
 .pdf-photos-grid.size-compact {
   max-height: 480px;
 }
@@ -1096,31 +1100,63 @@ textarea:focus {
   max-height: 740px;
 }
 
-/* Layout classes for PDF Photos (A4 Page) */
+/* Layout classes for PDF Photos (A4 Page) - Aspect Ratio Locked to 16:9 & 9:16 */
 .pdf-grid-2-landscape {
-  grid-template-rows: 1fr 1fr;
-  grid-template-columns: 1fr;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 16px;
+}
+.pdf-grid-2-landscape .pdf-photo-box {
+  width: 620px; /* Lock width on A4 page */
+  aspect-ratio: 16 / 9; /* Lock ratio to exactly 16:9 landscape */
 }
 
 .pdf-grid-3-landscape {
-  grid-template-rows: 1fr 1fr 1fr;
-  grid-template-columns: 1fr;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 12px;
+}
+.pdf-grid-3-landscape .pdf-photo-box {
+  width: 440px; /* Smaller so 3 of them fit vertically on A4 */
+  aspect-ratio: 16 / 9; /* Lock ratio to exactly 16:9 landscape */
 }
 
 .pdf-grid-3-mix {
-  grid-template-rows: 1.15fr 0.85fr;
-  grid-template-columns: 1fr;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 16px;
 }
 
 .pdf-grid-3-toprow {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  width: 100%;
+}
+.pdf-grid-3-toprow .pdf-photo-box {
+  width: 215px; /* Portrait boxes */
+  aspect-ratio: 9 / 16; /* Lock ratio to exactly 9:16 portrait */
+}
+.pdf-grid-3-mix > .pdf-photo-box { /* Bottom landscape box */
+  width: 446px; /* Matches the top row combined width */
+  aspect-ratio: 16 / 9; /* Lock ratio to exactly 16:9 landscape */
 }
 
 .pdf-grid-4-portrait {
+  display: grid;
   grid-template-columns: 1fr 1fr;
-  grid-template-rows: 1fr 1fr;
+  grid-template-rows: auto auto;
+  gap: 16px;
+  justify-items: center;
+  align-content: center;
+  width: 100%;
+}
+.pdf-grid-4-portrait .pdf-photo-box {
+  width: 220px; /* Portrait boxes */
+  aspect-ratio: 9 / 16; /* Lock ratio to exactly 9:16 portrait */
 }
 
 /* PDF Image Box */
