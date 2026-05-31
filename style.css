@@ -39,6 +39,7 @@ html, body {
   margin: 0;
   padding: 0;
   overflow: hidden; /* Mencegah scroll di seluruh body utama */
+  touch-action: manipulation; /* Mencegah double-tap zoom bawaan browser mobile */
 }
 
 body {
@@ -482,6 +483,46 @@ textarea:focus {
 .btn-secondary-sm:hover {
   background-color: #ccfbf1;
   transform: translateY(-1px);
+}
+
+/* Mic button for voice dictation */
+.btn-mic-recording {
+  background-color: #f0fdfa;
+  border: 1px solid #ccfbf1;
+  color: #0f766e;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-mic-recording:hover {
+  background-color: #ccfbf1;
+  transform: translateY(-1px);
+}
+
+.btn-mic-recording.recording {
+  background-color: #fee2e2 !important;
+  border-color: #fca5a5 !important;
+  color: #b91c1c !important;
+  animation: pulse-red-mic 1.5s infinite;
+}
+
+@keyframes pulse-red-mic {
+  0% {
+    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4);
+  }
+  70% {
+    box-shadow: 0 0 0 6px rgba(239, 68, 68, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
+  }
 }
 
 .step-actions {
@@ -1369,14 +1410,22 @@ textarea:focus {
     margin-bottom: 8px;
   }
   
+  /* Optimal readable font sizes and heights for mobile forms to prevent auto-zoom and increase legibility */
   input[type="text"], input[type="date"], input[type="time"], textarea {
-    padding: 8px 10px 8px 32px;
-    font-size: 12px;
-    border-radius: 8px;
+    padding: 10px 12px 10px 36px !important;
+    font-size: 16px !important; /* Menggunakan 16px untuk mencegah iOS auto-zoom dan keterbacaan optimal */
+    line-height: 1.4 !important;
+    border-radius: 8px !important;
   }
   
   textarea {
-    min-height: 54px;
+    min-height: 68px !important;
+    line-height: 1.4 !important;
+  }
+  
+  label {
+    font-size: 13px !important;
+    line-height: 1.4 !important;
   }
 
   /* STEP 2: TEMPLATE SELECTION (2 Columns, 2 Rows) */

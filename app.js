@@ -17,6 +17,7 @@ const elements = {
   kegiatanTanggal: document.getElementById('kegiatan-tanggal'),
   kegiatanWaktu: document.getElementById('kegiatan-waktu'),
   kegiatanAlamat: document.getElementById('kegiatan-alamat'),
+  kegiatanCatatan: document.getElementById('kegiatan-catatan'),
   btnGps: document.getElementById('btn-gps'),
   gpsStatus: document.getElementById('gps-status'),
   coordsContainer: document.getElementById('coords-container'),
@@ -34,6 +35,7 @@ const elements = {
   pdfValKegiatan: document.getElementById('pdf-val-kegiatan'),
   pdfValTanggal: document.getElementById('pdf-val-tanggal'),
   pdfValAlamat: document.getElementById('pdf-val-alamat'),
+  pdfValCatatan: document.getElementById('pdf-val-catatan'),
   pdfValKoordinat: document.getElementById('pdf-val-koordinat'),
   pdfRowCoords: document.getElementById('pdf-row-coords'),
   pdfPhotosGridRender: document.getElementById('pdf-photos-grid-render'),
@@ -50,6 +52,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initEventListeners();
   initTemplates();
   renderPhotoSlots();
+  initVoiceInput();
 });
 
 // 1. Inisialisasi Tanggal & Waktu Otomatis
@@ -662,6 +665,7 @@ function preparePDFPreview() {
   const tanggalInput = elements.kegiatanTanggal.value;
   const waktuInput = elements.kegiatanWaktu.value;
   const alamat = elements.kegiatanAlamat.value.trim() || 'Belum diisi';
+  const catatan = elements.kegiatanCatatan.value.trim() || 'Tidak ada catatan';
   
   // Format Tanggal yang lebih bersahabat (misal: Minggu, 31 Mei 2026)
   let tanggalFormatted = 'Belum diisi';
@@ -678,6 +682,7 @@ function preparePDFPreview() {
   elements.pdfValKegiatan.textContent = nama;
   elements.pdfValTanggal.textContent = tanggalFormatted;
   elements.pdfValAlamat.textContent = alamat;
+  elements.pdfValCatatan.textContent = catatan;
   
   // Koordinat GPS
   if (appState.coordinates) {
@@ -922,4 +927,69 @@ function hideLoading() {
 function getFormattedDateShort() {
   const d = new Date();
   return `${d.getFullYear()}${String(d.getMonth()+1).padStart(2, '0')}${String(d.getDate()).padStart(2, '0')}`;
+}
+
+// 12. Inisialisasi Voice Input (Speech-to-Text) untuk Catatan
+function initVoiceInput() {
+  const btnMic = document.getElementById('btn-mic-catatan');
+  const catatanInput = document.getElementById('kegiatan-catatan');
+  
+  if (!btnMic || !catatanInput) return;
+  
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SpeechRecognition) {
+    btnMic.style.display = 'none'; // Sembunyikan tombol jika browser tidak mendukung
+    return;
+  }
+  
+  const recognition = new SpeechRecognition();
+  recognition.lang = 'id-ID';
+  recognition.interimResults = false;
+  recognition.maxAlternatives = 1;
+  
+  let isListening = false;
+  
+  btnMic.addEventListener('click', () => {
+    if (isListening) {
+      recognition.stop();
+    } else {
+      try {
+        recognition.start();
+      } catch (err) {
+        console.error("Gagal memulai recognition:", err);
+      }
+    }
+  });
+  
+  recognition.onstart = () => {
+    isListening = true;
+    btnMic.classList.add('recording');
+    btnMic.innerHTML = '<i class="fa-solid fa-microphone-lines fa-beat"></i> Merekam...';
+  };
+  
+  recognition.onresult = (event) => {
+    const transcript = event.results[0][0].transcript;
+    const currentVal = catatanInput.value.trim();
+    catatanInput.value = currentVal ? `${currentVal} ${transcript}` : transcript;
+    
+    // Picu event input untuk memperbarui pratinjau PDF secara otomatis
+    catatanInput.dispatchEvent(new Event('input'));
+  };
+  
+  recognition.onerror = (event) => {
+    console.error("Speech recognition error:", event.error);
+    isListening = false;
+    btnMic.classList.remove('recording');
+    btnMic.innerHTML = '<i class="fa-solid fa-microphone"></i> Dikte';
+    
+    if (event.error === 'not-allowed') {
+      alert("Izin mikrofon ditolak. Silakan izinkan akses mikrofon di pengaturan browser Anda.");
+    }
+  };
+  
+  recognition.onend = () => {
+    isListening = false;
+    btnMic.classList.remove('recording');
+    btnMic.innerHTML = '<i class="fa-solid fa-microphone"></i> Dikte';
+  };
 }
