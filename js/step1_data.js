@@ -107,9 +107,9 @@ function handleGPSDetection() {
 
 // 3. Inisialisasi Penanganan Unggah Logo Instansi
 function initLogoUpload() {
-  const btnUpload = elements.btnUploadLogo;
-  const btnRemove = elements.btnRemoveLogo;
-  const fileInput = elements.kegiatanLogo;
+  const btnUpload = document.getElementById('btn-upload-logo');
+  const btnRemove = document.getElementById('btn-remove-logo');
+  const fileInput = document.getElementById('kegiatan-logo');
   
   if (!btnUpload || !fileInput) return;
   
@@ -124,9 +124,11 @@ function initLogoUpload() {
     }
   });
   
-  btnRemove.addEventListener('click', () => {
-    removeLogo();
-  });
+  if (btnRemove) {
+    btnRemove.addEventListener('click', () => {
+      removeLogo();
+    });
+  }
 }
 
 function processLogoFile(file) {
@@ -170,9 +172,10 @@ function processLogoFile(file) {
       appState.logoDataURL = compressedLogo;
       
       // Update UI Form Preview
-      if (elements.logoPreviewImg) {
-        elements.logoPreviewImg.src = compressedLogo;
-        elements.logoPreviewImg.classList.remove('hidden');
+      const previewImg = document.getElementById('logo-preview-img');
+      if (previewImg) {
+        previewImg.src = compressedLogo;
+        previewImg.classList.remove('hidden');
       }
       
       const placeholderIcon = document.getElementById('logo-placeholder-icon');
@@ -180,12 +183,15 @@ function processLogoFile(file) {
         placeholderIcon.classList.add('hidden');
       }
       
-      if (elements.btnRemoveLogo) {
-        elements.btnRemoveLogo.classList.remove('hidden');
+      const btnRemove = document.getElementById('btn-remove-logo');
+      if (btnRemove) {
+        btnRemove.classList.remove('hidden');
       }
       
       // Perbarui pratinjau PDF di Step 4
-      preparePDFPreview();
+      if (typeof preparePDFPreview === 'function') {
+        preparePDFPreview();
+      }
     };
   };
   reader.readAsDataURL(file);
@@ -194,9 +200,10 @@ function processLogoFile(file) {
 function removeLogo() {
   appState.logoDataURL = null;
   
-  if (elements.logoPreviewImg) {
-    elements.logoPreviewImg.src = '';
-    elements.logoPreviewImg.classList.add('hidden');
+  const previewImg = document.getElementById('logo-preview-img');
+  if (previewImg) {
+    previewImg.src = '';
+    previewImg.classList.add('hidden');
   }
   
   const placeholderIcon = document.getElementById('logo-placeholder-icon');
@@ -204,13 +211,18 @@ function removeLogo() {
     placeholderIcon.classList.remove('hidden');
   }
   
-  if (elements.btnRemoveLogo) {
-    elements.btnRemoveLogo.classList.add('hidden');
+  const btnRemove = document.getElementById('btn-remove-logo');
+  if (btnRemove) {
+    btnRemove.classList.add('hidden');
   }
-  if (elements.kegiatanLogo) {
-    elements.kegiatanLogo.value = '';
+  
+  const fileInput = document.getElementById('kegiatan-logo');
+  if (fileInput) {
+    fileInput.value = '';
   }
   
   // Perbarui pratinjau PDF di Step 4
-  preparePDFPreview();
+  if (typeof preparePDFPreview === 'function') {
+    preparePDFPreview();
+  }
 }
