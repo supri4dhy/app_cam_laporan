@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LaporCam - Pembuat Laporan Foto Lapangan</title>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap"
+    rel="stylesheet">
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="style.css">
+  <!-- jsPDF & html2canvas -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+</head>
+
+<body>
+
+  <!-- Background Decorative Blurs -->
+  <div class="bg-blur bg-blur-1"></div>
+  <div class="bg-blur bg-blur-2"></div>
+
+  <div class="app-container">
+    <!-- Header -->
+    <header class="app-header">
+      <div class="logo-area">
+        <div class="logo-icon">
+          <i class="fa-solid fa-camera-retro"></i>
+        </div>
+        <div class="logo-text">
+          <h1>Lapor<span>Cam</span></h1>
+          <p>Laporan Foto Lapangan Instan & Profesional</p>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Card - Form & Wizard -->
+    <main class="main-card">
+
+      <!-- Progress Bar / Steps indicator -->
+      <div class="steps-indicator">
+        <div class="step active" id="step-dot-1" onclick="navigateToStep(1)">
+          <span class="step-num">1</span>
+          <span class="step-label">Data</span>
+        </div>
+        <div class="step-line" id="step-line-1"></div>
+        <div class="step" id="step-dot-2" onclick="navigateToStep(2)">
+          <span class="step-num">2</span>
+          <span class="step-label">Template</span>
+        </div>
+        <div class="step-line" id="step-line-2"></div>
+        <div class="step" id="step-dot-3" onclick="navigateToStep(3)">
+          <span class="step-num">3</span>
+          <span class="step-label">Foto</span>
+        </div>
+        <div class="step-line" id="step-line-3"></div>
+        <div class="step" id="step-dot-4" onclick="navigateToStep(4)">
+          <span class="step-num">4</span>
+          <span class="step-label">Kirim</span>
+        </div>
+      </div>
+
+      <!-- STEP 1: INPUT DATA -->
+      <section class="step-content active" id="step-1">
+        <div class="section-title">
+          <i class="fa-solid fa-file-invoice text-gradient"></i>
+          <h2>Detail Kegiatan & Laporan</h2>
+        </div>
+
+        <div class="form-group">
+          <label for="kegiatan-nama">
+            <i class="fa-solid fa-circle-info"></i> Nama Kegiatan
+          </label>
+          <div class="input-wrapper">
+            <i class="fa-solid fa-pen-clip input-icon"></i>
+            <input type="text" id="kegiatan-nama" placeholder="Contoh: Peninjauan Jembatan Rusak Dusun A" required>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="kegiatan-tanggal">
+              <i class="fa-solid fa-calendar-day"></i> Hari & Tanggal
+            </label>
+            <div class="input-wrapper">
+              <i class="fa-solid fa-calendar-days input-icon"></i>
+              <input type="date" id="kegiatan-tanggal">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="kegiatan-waktu">
+              <i class="fa-solid fa-clock"></i> Waktu
+            </label>
+            <div class="input-wrapper">
+              <i class="fa-solid fa-clock input-icon"></i>
+              <input type="time" id="kegiatan-waktu">
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <div class="label-with-action">
+            <label for="kegiatan-alamat">
+              <i class="fa-solid fa-location-dot"></i> Alamat & Lokasi
+            </label>
+            <button type="button" id="btn-gps" class="btn-secondary-sm">
+              <i class="fa-solid fa-crosshairs"></i> Dapatkan GPS
+            </button>
+          </div>
+          <div class="input-wrapper">
+            <i class="fa-solid fa-map-location-dot input-icon align-top"></i>
+            <textarea id="kegiatan-alamat" rows="3"
+              placeholder="Masukkan alamat lengkap atau klik 'Dapatkan GPS' untuk mendeteksi lokasi secara otomatis..."></textarea>
+          </div>
+          <div id="gps-status" class="gps-status-info hidden">
+            <i class="fa-solid fa-spinner fa-spin"></i> Mendapatkan koordinat...
+          </div>
+          <div class="coordinates-display hidden" id="coords-container">
+            <span class="badge"><i class="fa-solid fa-compass"></i> Lat: <span id="lat-val">-</span></span>
+            <span class="badge"><i class="fa-solid fa-compass"></i> Lng: <span id="lng-val">-</span></span>
+          </div>
+        </div>
+
+        <div class="step-actions">
+          <div></div> <!-- Spacer -->
+          <button type="button" class="btn-primary" onclick="nextStep(1)">
+            Lanjut <i class="fa-solid fa-arrow-right"></i>
+          </button>
+        </div>
+      </section>
+
+      <!-- STEP 2: PILIH TEMPLATE -->
+      <section class="step-content" id="step-2">
+        <div class="section-title">
+          <i class="fa-solid fa-table-cells-large text-gradient"></i>
+          <h2>Pilih Template Foto</h2>
+        </div>
+        <p class="section-subtitle">Pilih tata letak (layout) foto laporan yang Anda inginkan di halaman PDF:</p>
+
+        <div class="template-grid">
+          <!-- Template 1: 2 Landscape -->
+          <div class="template-card" data-template="2-landscape">
+            <div class="template-preview">
+              <div class="t-layout layout-2-landscape">
+                <div class="t-box landscape">1</div>
+                <div class="t-box landscape">2</div>
+              </div>
+            </div>
+            <div class="template-info">
+              <h3>2 Foto Landscape</h3>
+              <p>Dua foto mendatar atas-bawah</p>
+            </div>
+            <div class="check-mark"><i class="fa-solid fa-circle-check"></i></div>
+          </div>
+
+          <!-- Template 2: 3 Landscape (Bersusun) -->
+          <div class="template-card" data-template="3-landscape">
+            <div class="template-preview">
+              <div class="t-layout layout-3-landscape">
+                <div class="t-box landscape">1</div>
+                <div class="t-box landscape">2</div>
+                <div class="t-box landscape">3</div>
+              </div>
+            </div>
+            <div class="template-info">
+              <h3>3 Foto Landscape</h3>
+              <p>Tiga foto mendatar atas-bawah</p>
+            </div>
+            <div class="check-mark"><i class="fa-solid fa-circle-check"></i></div>
+          </div>
+
+          <!-- Template 3: 3 Campuran (mix) -->
+          <div class="template-card" data-template="3-mix">
+            <div class="template-preview">
+              <div class="t-layout layout-3-mix">
+                <div class="t-sub-grid-top">
+                  <div class="t-box portrait">1</div>
+                  <div class="t-box portrait">2</div>
+                </div>
+                <div class="t-box landscape">3</div>
+              </div>
+            </div>
+            <div class="template-info">
+              <h3>3 Foto (Campuran)</h3>
+              <p>Atas: 2 Portrait, Bawah: 1 Landscape</p>
+            </div>
+            <div class="check-mark"><i class="fa-solid fa-circle-check"></i></div>
+          </div>
+
+          <!-- Template 4: 4 Portrait -->
+          <div class="template-card" data-template="4-portrait">
+            <div class="template-preview">
+              <div class="t-layout layout-4-portrait">
+                <div class="t-box portrait">1</div>
+                <div class="t-box portrait">2</div>
+                <div class="t-box portrait">3</div>
+                <div class="t-box portrait">4</div>
+              </div>
+            </div>
+            <div class="template-info">
+              <h3>4 Foto Portrait</h3>
+              <p>Empat foto tegak berformat grid 2x2</p>
+            </div>
+            <div class="check-mark"><i class="fa-solid fa-circle-check"></i></div>
+          </div>
+        </div>
+
+        <div class="step-actions">
+          <button type="button" class="btn-secondary" onclick="prevStep(2)">
+            <i class="fa-solid fa-arrow-left"></i> Kembali
+          </button>
+          <button type="button" class="btn-primary" onclick="nextStep(2)">
+            Lanjut <i class="fa-solid fa-arrow-right"></i>
+          </button>
+        </div>
+      </section>
+
+      <!-- STEP 3: INPUT FOTO -->
+      <section class="step-content" id="step-3">
+        <div class="section-title">
+          <i class="fa-solid fa-images text-gradient"></i>
+          <h2>Unggah & Ambil Foto</h2>
+        </div>
+        <p class="section-subtitle">Masukkan foto untuk melengkapi laporan. Klik pada slot untuk mengambil foto dari
+          kamera atau memilih file.</p>
+
+        <!-- Dynamic Photo Upload Grid -->
+        <div id="photo-upload-container" class="photo-upload-grid">
+          <!-- Diisi secara dinamis berdasarkan template yang dipilih -->
+        </div>
+
+        <div class="step-actions">
+          <button type="button" class="btn-secondary" onclick="prevStep(3)">
+            <i class="fa-solid fa-arrow-left"></i> Kembali
+          </button>
+          <button type="button" class="btn-primary" onclick="nextStep(3)">
+            Tinjau Laporan <i class="fa-solid fa-arrow-right"></i>
+          </button>
+        </div>
+      </section>
+
+      <!-- STEP 4: REVIEW & ACTION -->
+      <section class="step-content" id="step-4">
+        <div class="section-title">
+          <i class="fa-solid fa-square-poll-horizontal text-gradient"></i>
+          <h2>Kirim & Unduh Laporan</h2>
+        </div>
+
+        <div class="action-buttons-container">
+          <button type="button" id="btn-generate-pdf" class="btn-action btn-pdf">
+            <i class="fa-solid fa-file-pdf"></i> Unduh PDF Laporan (A4)
+          </button>
+          <button type="button" id="btn-share-wa" class="btn-action btn-whatsapp">
+            <i class="fa-brands fa-whatsapp"></i> Bagikan ke WhatsApp
+          </button>
+        </div>
+
+        <!-- PDF Settings Card -->
+        <div class="settings-card">
+          <div class="settings-title">
+            <i class="fa-solid fa-sliders text-gradient"></i>
+            <h3>Pengaturan Tampilan PDF</h3>
+          </div>
+          <div class="settings-grid">
+            <div class="form-group">
+              <label for="pdf-photo-fit">
+                <i class="fa-solid fa-expand"></i> Kesesuaian Ukuran Foto
+              </label>
+              <select id="pdf-photo-fit" class="form-select">
+                <option value="cover" selected>Potong & Penuhi (Rapi / Grid Seragam)</option>
+                <option value="contain">Muat Utuh (Tanpa Terpotong / Asli)</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="pdf-photo-size">
+                <i class="fa-solid fa-arrows-up-down"></i> Tinggi Area Foto
+              </label>
+              <select id="pdf-photo-size" class="form-select">
+                <option value="normal" selected>Sedang (Normal)</option>
+                <option value="compact">Kecil (Hemat Halaman)</option>
+                <option value="large">Besar (Sangat Detail)</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="preview-header">
+          <h3><i class="fa-regular fa-file-lines"></i> Pratinjau Halaman Laporan (A4)</h3>
+          <p>Tampilan di bawah ini adalah estimasi layout laporan di lembar A4.</p>
+        </div>
+
+        <!-- PDF A4 Preview Canvas Container -->
+        <div class="pdf-preview-scroller">
+          <div class="pdf-a4-page" id="pdf-content-to-render">
+            <div class="pdf-header">
+              <div class="pdf-title-block">
+                <h2>LAPORAN KEGIATAN LAPANGAN</h2>
+                <div class="pdf-divider"></div>
+              </div>
+              <div class="pdf-meta-table">
+                <div class="pdf-meta-row">
+                  <span class="pdf-meta-label">Nama Kegiatan</span>
+                  <span class="pdf-meta-separator">:</span>
+                  <span class="pdf-meta-value" id="pdf-val-kegiatan">Belum diisi</span>
+                </div>
+                <div class="pdf-meta-row">
+                  <span class="pdf-meta-label">Hari / Tanggal</span>
+                  <span class="pdf-meta-separator">:</span>
+                  <span class="pdf-meta-value" id="pdf-val-tanggal">Belum diisi</span>
+                </div>
+                <div class="pdf-meta-row">
+                  <span class="pdf-meta-label">Lokasi / Alamat</span>
+                  <span class="pdf-meta-separator">:</span>
+                  <span class="pdf-meta-value" id="pdf-val-alamat">Belum diisi</span>
+                </div>
+                <div class="pdf-meta-row" id="pdf-row-coords">
+                  <span class="pdf-meta-label">Koordinat GPS</span>
+                  <span class="pdf-meta-separator">:</span>
+                  <span class="pdf-meta-value" id="pdf-val-koordinat">-</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Bagian Bawah Laporan: Galeri Foto sesuai template -->
+            <div class="pdf-photos-section">
+              <h3 class="pdf-section-title">DOKUMENTASI FOTO KEGIATAN</h3>
+              <div class="pdf-photos-grid" id="pdf-photos-grid-render">
+                <!-- Diisi dinamis berdasarkan foto yang diunggah -->
+              </div>
+            </div>
+
+            <div class="pdf-footer">
+              <p>Dibuat secara otomatis melalui LaporCam App pada <span id="pdf-current-timestamp"></span></p>
+              <p>Halaman 1 dari 1</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="step-actions">
+          <button type="button" class="btn-secondary" onclick="prevStep(4)">
+            <i class="fa-solid fa-arrow-left"></i> Kembali
+          </button>
+          <div></div> <!-- Spacer -->
+        </div>
+      </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="app-footer-text">
+      <p>&copy; 2026 LaporCam App. Semua data disimpan secara lokal di perangkat Anda.</p>
+    </footer>
+  </div>
+
+  <!-- Loading Overlay -->
+  <div id="loading-overlay" class="loading-overlay hidden">
+    <div class="spinner-container">
+      <div class="custom-spinner"></div>
+      <p id="loading-text">Sedang memproses...</p>
+    </div>
+  </div>
+
+  <!-- Mobile Bottom Navigation Bar -->
+  <nav class="mobile-bottom-nav">
+    <div class="mobile-nav-item active" id="mobile-nav-1" onclick="navigateToStep(1)">
+      <i class="fa-solid fa-file-invoice"></i>
+      <span>Data</span>
+    </div>
+    <div class="mobile-nav-item" id="mobile-nav-2" onclick="navigateToStep(2)">
+      <i class="fa-solid fa-table-cells-large"></i>
+      <span>Template</span>
+    </div>
+    <div class="mobile-nav-item" id="mobile-nav-3" onclick="navigateToStep(3)">
+      <i class="fa-solid fa-images"></i>
+      <span>Foto</span>
+    </div>
+    <div class="mobile-nav-item" id="mobile-nav-4" onclick="navigateToStep(4)">
+      <i class="fa-solid fa-paper-plane"></i>
+      <span>Kirim</span>
+    </div>
+  </nav>
+
+  <!-- Custom JS -->
+  <script src="app.js"></script>
+</body>
+
+</html>
