@@ -5,26 +5,28 @@
 
 @media (max-width: 768px) {
 
-  /* ----- RESET BODY AGAR BISA SCROLL PROPORSIAL ----- */
+  /* ----- RESET BODY TOTAL NO-SCROLL (FIT LAYAR HP) ----- */
   html, body {
-    overflow-x: hidden !important;
-    overflow-y: auto !important;
-    height: 100% !important;
-    min-height: 100dvh !important; /* Menggunakan Dynamic Viewport Height */
+    overflow: hidden !important; /* Blokir total scrolling luar */
+    height: 100dvh !important;
+    min-height: 100dvh !important;
     background-color: #f1f5f9 !important;
+    margin: 0 !important;
+    padding: 0 !important;
   }
 
   /* ----- APP CONTAINER ----- */
   .app-container {
     width: 100% !important;
     max-width: 100vw !important;
+    height: 100dvh !important;
+    max-height: 100dvh !important;
     padding: 8px !important;
-    height: auto !important;
-    max-height: none !important;
     gap: 6px !important;
     box-sizing: border-box !important;
     display: flex !important;
     flex-direction: column !important;
+    overflow: hidden !important; /* Kunci semua elemen agar muat satu layar */
     /* Ruang untuk bottom nav */
     padding-bottom: calc(72px + env(safe-area-inset-bottom)) !important;
   }
@@ -51,6 +53,7 @@
 
   .logo-icon i {
     font-size: 16px !important;
+    color: #0f172a !important; /* Diubah menjadi gelap arang agar sangat kontras dan terlihat jelas */
   }
 
   .logo-text h1 {
@@ -75,9 +78,11 @@
     border-radius: 16px !important;
     padding: 14px !important;
     gap: 10px !important;
-    overflow: visible !important;
+    overflow: hidden !important; /* Kunci main card */
     height: auto !important;
-    flex: none !important;
+    flex: 1 !important; /* Isi ruang sisa container secara fleksibel */
+    display: flex !important;
+    flex-direction: column !important;
   }
 
   /* ----- STEP INDICATOR (Sembunyikan di mobile) ----- */
@@ -89,8 +94,9 @@
   .step-content {
     display: none !important;
     flex-direction: column !important;
-    overflow: visible !important;
+    overflow: hidden !important; /* Kunci content */
     height: auto !important;
+    flex: 1 !important; /* Isi ruang sisa card */
   }
 
   .step-content.active {
@@ -119,9 +125,11 @@
     display: flex !important;
     flex-direction: column !important;
     gap: 8px !important;
-    overflow: visible !important;
-    height: auto !important;
+    overflow-y: auto !important; /* Scroll hanya terjadi di dalam form saja jika melebihi layar */
+    -webkit-overflow-scrolling: touch !important;
+    flex: 1 !important;
     width: 100% !important;
+    padding-right: 2px !important;
   }
 
   /* form-row (Hari & Tanggal + Waktu) tetap 2 kolom tapi kompak */
