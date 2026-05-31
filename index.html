@@ -22,8 +22,8 @@
   <link rel="icon" type="image/png" href="icon-192.png">
   
   <!-- Custom CSS -->
-  <link rel="stylesheet" href="style.css?v=2.1">
-  <link rel="stylesheet" href="style-mobile.css?v=2.1">
+  <link rel="stylesheet" href="style.css?v=2.5">
+  <link rel="stylesheet" href="style-mobile.css?v=2.5">
   <!-- jsPDF & html2canvas -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -91,6 +91,27 @@
         <div class="section-title">
           <i class="fa-solid fa-file-invoice text-gradient"></i>
           <h2>Detail Kegiatan & Laporan</h2>
+        </div>
+
+        <!-- Banner Install PWA (Hanya Muncul jika belum terinstall) -->
+        <div id="pwa-install-banner" class="pwa-install-banner hidden">
+          <div class="pwa-banner-content">
+            <div class="pwa-icon-wrapper">
+              <img src="icon-192.png" alt="LaporCam Icon" class="pwa-app-icon">
+            </div>
+            <div class="pwa-text-wrapper">
+              <h3>Gunakan LaporCam Lebih Cepat</h3>
+              <p>Tambahkan ke layar utama untuk pengalaman full-screen tanpa hambatan navigasi browser.</p>
+            </div>
+          </div>
+          <div class="pwa-banner-actions">
+            <button type="button" id="btn-pwa-install" class="btn-primary-sm">
+              <i class="fa-solid fa-square-plus"></i> Pasang Pintasan
+            </button>
+            <button type="button" id="btn-pwa-dismiss" class="btn-dismiss" title="Tutup">
+              <i class="fa-solid fa-xmark"></i>
+            </button>
+          </div>
         </div>
 
         <div class="form-inputs-container">
@@ -461,13 +482,13 @@
   </nav>
 
   <!-- Custom JS Modules -->
-  <script src="js/state.js?v=1.2"></script>
-  <script src="js/voice.js?v=1.2"></script>
-  <script src="js/step1_data.js?v=1.2"></script>
-  <script src="js/step2_tmpl.js?v=1.2"></script>
-  <script src="js/step3_photo.js?v=1.2"></script>
-  <script src="js/step4_pdf.js?v=1.2"></script>
-  <script src="app.js?v=1.2"></script>
+  <script src="js/state.js?v=2.5"></script>
+  <script src="js/voice.js?v=2.5"></script>
+  <script src="js/step1_data.js?v=2.5"></script>
+  <script src="js/step2_tmpl.js?v=2.5"></script>
+  <script src="js/step3_photo.js?v=2.5"></script>
+  <script src="js/step4_pdf.js?v=2.5"></script>
+  <script src="app.js?v=2.5"></script>
 </body>
 
 </html>

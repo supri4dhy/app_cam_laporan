@@ -50,5 +50,10 @@ const elements = {
   
   // Action Buttons
   btnGeneratePdf: document.getElementById('btn-generate-pdf'),
-  btnShareWa: document.getElementById('btn-share-wa')
+  btnShareWa: document.getElementById('btn-share-wa'),
+  
+  // PWA Install Elements
+  pwaInstallBanner: document.getElementById('pwa-install-banner'),
+  btnPwaInstall: document.getElementById('btn-pwa-install'),
+  btnPwaDismiss: document.getElementById('btn-pwa-dismiss')
 };

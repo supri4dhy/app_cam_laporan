@@ -161,3 +161,57 @@ function getFormattedDateShort() {
   const d = new Date();
   return `${d.getFullYear()}${String(d.getMonth()+1).padStart(2, '0')}${String(d.getDate()).padStart(2, '0')}`;
 }
+
+// 5. Logika Install Banner PWA (Shortcut Layar Utama)
+let deferredPrompt;
+
+window.addEventListener('beforeinstallprompt', (e) => {
+  // Cegah browser menampilkan prompt bawaan secara langsung
+  e.preventDefault();
+  // Simpan event agar bisa dipicu nanti
+  deferredPrompt = e;
+  
+  // Tampilkan banner kustom di Step 1
+  if (elements.pwaInstallBanner) {
+    elements.pwaInstallBanner.classList.remove('hidden');
+  }
+});
+
+// Daftarkan event listener untuk tombol aksi di banner PWA
+if (elements.btnPwaInstall) {
+  elements.btnPwaInstall.addEventListener('click', async () => {
+    if (!deferredPrompt) return;
+    
+    // Tampilkan prompt instalasi bawaan browser
+    deferredPrompt.prompt();
+    
+    // Tunggu respons pilihan dari pengguna
+    const { outcome } = await deferredPrompt.userChoice;
+    console.log(`Pilihan instalasi pengguna: ${outcome}`);
+    
+    // Bersihkan prompt deferred karena hanya bisa dipanggil sekali
+    deferredPrompt = null;
+    
+    // Sembunyikan banner
+    if (elements.pwaInstallBanner) {
+      elements.pwaInstallBanner.classList.add('hidden');
+    }
+  });
+}
+
+if (elements.btnPwaDismiss) {
+  elements.btnPwaDismiss.addEventListener('click', () => {
+    // Sembunyikan banner jika pengguna memilih untuk menutupnya
+    if (elements.pwaInstallBanner) {
+      elements.pwaInstallBanner.classList.add('hidden');
+    }
+  });
+}
+
+// Sembunyikan banner secara otomatis setelah berhasil terinstall
+window.addEventListener('appinstalled', (evt) => {
+  console.log('LaporCam berhasil terinstal!');
+  if (elements.pwaInstallBanner) {
+    elements.pwaInstallBanner.classList.add('hidden');
+  }
+});
